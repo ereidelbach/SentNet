@@ -1,4 +1,4 @@
-![Project Logo](https://github.com/ereidelbach/SentNet/blob/master/projectLogo.png)
+![Project Logo](https://gitlab.visionistinc.com/data_science/SentNet/blob/master/projectLogo.png)
 
 ----
 
