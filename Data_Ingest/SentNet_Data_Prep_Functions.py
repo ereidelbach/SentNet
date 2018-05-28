@@ -17,6 +17,8 @@ import os
 import sys
 import pandas as pd
 
+nsmap = {'w': 'http://schemas.openxmlformats.org/wordprocessingml/2006/main'}
+
 def File_Selector_Training(path):
     '''
     Input: Path to a given folder/repository
@@ -233,7 +235,11 @@ def Ingest_Training_Data(doc_folder_path, img_dir):
     
     # Obtain data from documents and append to the Training Data Dataframe
     for d in Docx_list:
-        temp_df = Extract_Docx_Features(doc_folder_path, d, img_dir)
+        try:
+            temp_df = Extract_Docx_Features(doc_folder_path, d, img_dir)
+        except:
+            print("Error importing "+str(d)+" - File may 1) Be open in another program, 2) Not a true .docx file, 3) a temporary file or 4) corrupted.")
+            pass
         Training_Data = Training_Data.append({'Doc_Title':temp_df['file_name'], 'Doc_Text':temp_df['text'],'Doc_Images':temp_df['image_list']}, ignore_index=True)
     
     # Return the a data frame with the final features
@@ -242,3 +248,7 @@ def Ingest_Training_Data(doc_folder_path, img_dir):
 
 
         
+    
+    
+    
+    
