@@ -17,6 +17,10 @@ Created on Mon May 28 17:54:21 2018
         https://pypi.org/project/textatistic/
     - TextStat Python Package
         https://pypi.org/project/textstat/
+    - Textacy Python Package
+        Requires the `en` library: python -m spacy download en
+        Must run as administrator if on Windows
+        
 :TODO:
 """
  
@@ -25,6 +29,8 @@ Created on Mon May 28 17:54:21 2018
 #==============================================================================
 import os   
 import pandas as pd
+import spacy
+spacy.load('en')
 from textstat.textstat import textstat
 from textatistic import Textatistic
 import textacy
@@ -115,6 +121,9 @@ def textstat_scores(document):
     
         Details on the package can be found here:
             - https://chartbeat-labs.github.io/textacy/index.html
+            
+        You must install the English module for this package to function:
+            - python -m spacy download en
         
     Input:
         document (string): string containing the document to be scored
@@ -125,17 +134,19 @@ def textstat_scores(document):
             syllables, and sentences
 '''
 def textacy_scores(document):
+    doc = textacy.Doc(document)
+    ts = textacy.TextStats(doc)
     document_dict = {}
-    document_dict['count_sent'] = textacy.n_sents(document)
-    document_dict['count_sybl'] = textacy.n_syllables(document)
-    document_dict['count_word'] = textacy.n_words(document)
+    document_dict['count_sent'] = ts.n_sents
+    document_dict['count_sybl'] = ts.n_syllables
+    document_dict['count_word'] = ts.n_words
     try:
-        document_dict['score_colemanliau'] = textacy.coleman_liau_index(document)
+        document_dict['score_colemanliau'] = ts.coleman_liau_index
         document_dict['score_dalechall'] = 'N/A'
-        document_dict['score_flesch'] = textacy.flesch_reading_ease(document)
-        document_dict['score_fleschkincaid'] = textacy.flesch_kincaid_grade_level(document)
-        document_dict['score_gunningfog'] = textacy.gunning_fog_index(document)
-        document_dict['score_smog'] = textacy.smog_index(document)
+        document_dict['score_flesch'] = ts.flesch_reading_ease
+        document_dict['score_fleschkincaid'] = ts.flesch_kincaid_grade_level
+        document_dict['score_gunningfog'] = ts.gunning_fog_index
+        document_dict['score_smog'] = ts.smog_index
     except(ZeroDivisionError):
         print('TEXTACY -- Error with: ' + document)
         document_dict['score_colemanliau'] = 'N/A'
