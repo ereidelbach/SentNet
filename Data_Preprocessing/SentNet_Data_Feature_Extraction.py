@@ -8,6 +8,8 @@ Created on Fri May 25 23:17:02 2018
 
 # Import the required packages
 import pandas as pd
+import itertools
+import sklearn
 from SentNet_Data_Prep_Functions import Ingest_Training_Data
 from Goldberg_Perceptual_Hashing import ImageSignature
 gis = ImageSignature()
@@ -24,9 +26,8 @@ import nltk
 
 from nltk.corpus import wordnet as wn
 from nltk.corpus import stopwords
-#from nltk.tokenize import word_tokenize
+from nltk.tokenize import word_tokenize
 from nltk.tokenize import PunktSentenceTokenizer
-sent_tokenize = nltk.tokenize.punkt.PunktSentenceTokenizer()
 stop_words = set(stopwords.words('english'))
 
 # Define the list of punctuation to be removed
@@ -50,9 +51,6 @@ data = pd.DataFrame.from_csv(traing_data, sep='\t', header=0, encoding='ISO-8859
 data = data[data['essay_set']==1]
 
 ################################## Data/String Cleaning ##########################################
-
-# Break document into sentences
-sent_list = sent_tokenize.tokenize(text)
 
 # Prep text
 def remove_punc(text):
@@ -81,8 +79,6 @@ def clean_sentence(text):
     return(string)
     
     
-
-
 ################################## Word Feature Generation ##########################################
 
 # Unique words in corpus
@@ -110,7 +106,7 @@ term_frequency_counts = pd.DataFrame(count_matrix.apply(lambda column: sum(colum
 
 # Define the minimum threshold to observe a item (word or synset) for it to be included in our analysis
 limit = round(0.01*len(count_matrix))
-selected_features = term_frequency_counts[term_frequency_counts['Counts']>20]
+selected_features = term_frequency_counts[term_frequency_counts['Counts']>limit]
 selected_features = selected_features.index
 word_matrix_features = count_matrix[selected_features]
 
@@ -122,7 +118,7 @@ def WordNet_Translator(term):
     hypernym_list = []
     synset = wn.synsets(term)
     if len(synset)==0:
-        print(term)
+        #print(term) --> Enable this if you want to see the terms that do not have matching synsets
         pass
     else:
         synset = synset[0]
@@ -136,25 +132,22 @@ def WordNet_Translator(term):
 def return_hypernym_codes(hypernym_list):
     hypernym_codes = []
     for hypernym in hypernym_list:
-        hypernym_codes.append(str(hypernym.name()))
+        hypernym_codes.append(str(hypernym.name()).replace(".","")) #removing periods for now
     return(hypernym_codes)
         
 # Unique synsets in corpus
-unqiue_synsets = set() 
+unique_synsets = set() 
 
 for index, row in data.iterrows():
     temp_words = set(clean_words(row['essay']))
     for word in temp_words:
         temp_synsets = WordNet_Translator(word)
         if len(temp_synsets)>0:
-            unqiue_synsets = unqiue_synsets.union(temp_synsets)
+            unique_synsets = unique_synsets.union(temp_synsets)
         else:
             pass
 
-#This is a list of all the unique synsets in the corpus     
-unqiue_synsets = list(unqiue_synsets)
-
-#Building a Synset Matrix
+# Building a Synset Translation for each essay
 punctuations = '''!()-[]{};.:'"\,<>/?@#$%^&*_~'''
 
 def synset_translated_sentence(text):
@@ -163,8 +156,58 @@ def synset_translated_sentence(text):
     for i in temp:
         i = WordNet_Translator(i)
         for s in i:
+            #s.replace(".","")
             string += (" "+s)
     return(string)
+
+# Building a Synset Translation for each essay
+data['essay_synset_translation'] = data.apply(lambda row: synset_translated_sentence(row['essay']),axis=1)
+
+# develop the vocab list for the methods to search over
+unique_synsets = list(unique_synsets)
+
+# Train and run the sklearn vectorizor to get a sparse matrix representation
+count_vec_syn = sklearn.feature_extraction.text.CountVectorizer(vocabulary=unique_synsets,lowercase=False,)
+count_matrix_syn = count_vec_syn.fit_transform(data['essay_synset_translation'])
+
+# Convert the sparse SciPy matrix into a dense matrix and convert intoa a pandas dataframe for further analysis
+count_matrix_syn = pd.DataFrame(count_matrix_syn.todense(),columns=unique_synsets)
+synset_frequency_counts = pd.DataFrame(count_matrix_syn.apply(lambda column: sum(column)),columns=['Counts'])
+
+# Define the minimum threshold to observe a item (word or synset) for it to be included in our analysis
+limit = round(0.01*len(count_matrix_syn))
+selected_features_syn = synset_frequency_counts[synset_frequency_counts['Counts']>limit]
+selected_features_syn = selected_features_syn.index
+synset_matrix_features = count_matrix_syn[selected_features_syn]
+
+
+################################## Edge Feature Generation ##########################################
+
+sent_tokenize = nltk.tokenize.punkt.PunktSentenceTokenizer()
+
+# Break document into sentences, then word tokens, return all combinations of tokens
+def edge_extractor(text):
+    doc_edge_list = pd.DataFrame(columns=['Item_A','Item_B'])
+    sent_list = sent_tokenize.tokenize(text)
+    for sent in sent_list:
+        term_list = sorted(clean_words(sent))
+        edge_list = list(itertools.combinations(term_list, 2))
+        doc_edge_list = doc_edge_list.append(pd.DataFrame(list(edge_list),columns=['Item_A','Item_B']), ignore_index=True)
+    return(doc_edge_list)
+
+# Get the edge counts for all sentences in all documents
+master_edge_list = pd.DataFrame(columns=['Item_A','Item_B'])
+
+for index, row in data.iterrows():
+    master_edge_list = master_edge_list.append(edge_extractor(row['essay']), ignore_index=True)
+
+
+
+
+        
+        
+        
+
 
 
 
@@ -188,33 +231,3 @@ word_1.hypernym_paths()
 
 word_2 = word_2[0]
 word_2.hypernym_paths()
-
-
-
-#### What not to do! #######
-for index, row in data.iterrows():
-    temp_words = data.apply(lambda row: clean_text(row['essay']), axis=1)
-    print(temp_words)
-    temp_words = set(list(temp_words))
-    unqiue_words = unqiue_words.union(
-
-# Prep images
-
-
-# Workspace
-    
-    
-    
-# Feature Set
-
-# 1) Term Counts
-# 2) Synset Counts
-# 3) Bewtweeness Centrality
-
-wn.synsets('ocean')
-    
-    
-    
-    
-    
-    
