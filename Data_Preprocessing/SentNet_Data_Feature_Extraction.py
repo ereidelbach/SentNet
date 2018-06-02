@@ -8,6 +8,7 @@ Created on Fri May 25 23:17:02 2018
 
 # Import the required packages
 import pandas as pd
+import numpy as np
 import itertools
 import sklearn
 import networkx as nx
@@ -203,6 +204,7 @@ def touple_edge_extractor(text):
         term_list = sorted(clean_words(sent))
         edge_list = list(itertools.combinations(term_list, 2))
         doc_edge_list.extend(edge_list)
+        #print(len(doc_edge_list))
     return(doc_edge_list)
 
 # Get the edge counts for all sentences in all documents
@@ -211,12 +213,59 @@ def touple_edge_extractor(text):
 # Get the edge counts for all sentences in all documents
 master_edge_list = pd.DataFrame(columns=['Item_A','Item_B'])
 for index, row in data.iterrows():
+    doc_edges = pd_edge_extractor(row['essay'])
+    master_edge_list = master_edge_list.append(doc_edges, ignore_index=True)
+
+# Calculate which edges are the most common among the documents to collect counts for
+master_edge_list['edge_id'] = master_edge_list.Item_A.str.cat(master_edge_list.Item_B)
+selected_edge_list = pd.DataFrame(master_edge_list['edge_id'].value_counts())
+selected_edge_list = selected_edge_list[selected_edge_list['edge_id']>limit]
+selected_edge_list = list(selected_edge_list.index)
+
+# Translate document text into edges representation
+def edge_translation(text):
+    doc_translation = ""
+    doc_touples = touple_edge_extractor(text)
+    for t in doc_touples:
+        temp_t = str(t[0])+str(t[1])
+        doc_translation = doc_translation +" "+temp_t
+    return(doc_translation)
+
+data['edge_translation']=data.apply(lambda row: edge_translation(row['essay']), axis=1)
+
+# Train and run the sklearn vectorizor to get a sparse matrix representation
+count_vec_edges = sklearn.feature_extraction.text.CountVectorizer(vocabulary=selected_edge_list, lowercase=False)
+count_matrix_edges = count_vec_edges.fit_transform(data['edge_translation'])
+
+# Convert the sparse SciPy matrix into a dense matrix and convert intoa a pandas dataframe for further analysis
+edges_matrix_features = pd.DataFrame(count_matrix_edges.todense(), columns=selected_edge_list)
+
+
+################################## Document Network Creation ##########################################        
+
+# Term/Word Betweeness Centrality
+
+# Create Betweeness Centrality Dataframe
+word_centrality_matrix = pd.DataFrame()
+
+# Populate DataFrame with betweenness centralities 
+
+for index, row in data.iterrows():
     
-    # Create Document Specific Network
+    # Extract all edges from the docuemnt as touples
     doc_edges = touple_edge_extractor(row['essay'])
+    
+    # Create a graph using all the edge inputs as touples
     G = nx.Graph()
     G.add_edges_from(doc_edges)
-    Node_list = list(G.nodes()) 
+    btwn_dict = nx.betweenness_centrality(G)
+    Node_list = set(G.nodes())
+    Node_list = list(Node_list & set(selected_features))
+    temp_dict = {}
+    for n in Node_list:
+        col = str(n)+"_btw"
+        temp_dict[col]= btwn_dict[n]
+    word_centrality_matrix = word_centrality_matrix.append(temp_dict,ignore_index=True)
+        
     
-    
-    master_edge_list = master_edge_list.append(row['edge_list'], ignore_index=True)
+# Synset Betweeness Centrality
