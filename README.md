@@ -35,10 +35,10 @@ TBD
 
 Setnet was developed on a system with the following resources. When attempting to run SentNet it is recomended that you have a system with similar specifications:
 
-Operating System: Windows 10
-Processor: Intel Core i7-7700 - 3.6 Ghz
-RAM: 16 GB
-Hard Drive: 10 Gb of Hard Drive Space Available
+* Operating System: Windows 10
+* Processor: Intel Core i7-7700 - 3.6 Ghz
+* RAM: 16 GB
+* Hard Drive: 10 GB of Hard Drive Space Available
 
 # Python Packages
 
