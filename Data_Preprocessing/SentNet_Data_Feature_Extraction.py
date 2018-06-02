@@ -4,6 +4,7 @@ Created on Fri May 25 23:17:02 2018
 
 @author: GTayl
 """
+
 ################################## Set-up ##########################################
 
 # Import the required packages
@@ -16,21 +17,28 @@ from SentNet_Data_Prep_Functions import Ingest_Training_Data
 from Goldberg_Perceptual_Hashing import ImageSignature
 gis = ImageSignature()
 
-# Note the English NLTK corpus will need to be downloaded for these to function properly
-# To download the corpus you must run the following:
-import nltk
-# nltk.download()
-# Select the following items to download:
-# 1) Stopwords
-# 2) WordNet
-# 3) WordNet_IC
-# 4) Punkt
-
-from nltk.corpus import wordnet as wn
-from nltk.corpus import stopwords
-from nltk.tokenize import word_tokenize
-from nltk.tokenize import PunktSentenceTokenizer
-stop_words = set(stopwords.words('english'))
+# Importing NLTK related packages and content
+try:
+    import nltk
+    from nltk.corpus import wordnet as wn
+    from nltk.corpus import stopwords
+    from nltk.tokenize import word_tokenize
+    from nltk.tokenize import PunktSentenceTokenizer
+    stop_words = set(stopwords.words('english'))
+    
+except:
+    print(""" Note the English NLTK corpus will need to be downloaded for these to function properly. To download the corpus you must run the following:
+            
+            1) import nltk
+            2) nltk.download()
+            
+            Select the following items to download:
+            a) Stopwords
+            b) WordNet
+            c) WordNet_IC
+            d) Punkt
+               
+            """)
 
 # Define the list of punctuation to be removed
 # define punctuation
@@ -183,7 +191,7 @@ selected_features_syn = selected_features_syn.index
 synset_matrix_features = count_matrix_syn[selected_features_syn]
 
 
-################################## Edge Feature Generation ##########################################
+################################## Word - Edge Feature Generation ##########################################
 
 sent_tokenize = nltk.tokenize.punkt.PunktSentenceTokenizer()
 
@@ -206,9 +214,6 @@ def touple_edge_extractor(text):
         doc_edge_list.extend(edge_list)
         #print(len(doc_edge_list))
     return(doc_edge_list)
-
-# Get the edge counts for all sentences in all documents
-# test = data.apply(lambda row: edge_extractor(row['essay']),axis=1) # Doesn't work for some reason
 
 # Get the edge counts for all sentences in all documents
 master_edge_list = pd.DataFrame(columns=['Item_A','Item_B'])
@@ -241,7 +246,7 @@ count_matrix_edges = count_vec_edges.fit_transform(data['edge_translation'])
 edges_matrix_features = pd.DataFrame(count_matrix_edges.todense(), columns=selected_edge_list)
 
 
-################################## Document Network Creation ##########################################        
+################################## Word - Document Network Creation ##########################################        
 
 # Term/Word Betweeness Centrality
 
@@ -268,4 +273,95 @@ for index, row in data.iterrows():
     word_centrality_matrix = word_centrality_matrix.append(temp_dict,ignore_index=True)
         
     
+################################## Synset - Edge Feature Generation ##########################################
+
+#
+def synset_translated_sentence(text):
+    synset_list = []
+    temp = clean_words(text)
+    for i in temp:
+        i = WordNet_Translator(i)
+        for s in i:
+            synset_list.append(s)
+    return(synset_list)
+
+#
+def pd_edge_extractor_synset(text):
+    doc_edge_list = pd.DataFrame(columns=['Synset_A','Synset_B'])
+    sent_list = sent_tokenize.tokenize(text)
+    for sent in sent_list:
+        term_list = sorted(synset_translated_sentence(sent))
+        edge_list = list(itertools.combinations(term_list, 2))
+        doc_edge_list = doc_edge_list.append(pd.DataFrame(list(edge_list),columns=['Synset_A','Synset_B']), ignore_index=True)
+    return(doc_edge_list)
+
+#
+def touple_edge_extractor_synset(text):
+    doc_edge_list = []
+    sent_list = sent_tokenize.tokenize(text)
+    for sent in sent_list:
+        term_list = sorted(synset_translated_sentence(sent))
+        edge_list = list(itertools.combinations(term_list, 2))
+        doc_edge_list.extend(edge_list)
+        #print(len(doc_edge_list))
+    return(doc_edge_list)
+
+# Get the synset edge counts for all sentences in all documents
+master_edge_list_synset = pd.DataFrame(columns=['Synset_A','Synset_B'])
+for index, row in data.iterrows():
+    doc_edges_synset = pd_edge_extractor_synset(row['essay'])
+    master_edge_list_synset = master_edge_list_synset.append(doc_edges_synset, ignore_index=True)
+
+# Calculate which synset edges are the most common among the documents to collect counts for
+master_edge_list_synset['edge_id'] = master_edge_list_synset.Synset_A.str.cat(master_edge_list_synset.Synset_B)
+selected_edge_list_synset = pd.DataFrame(master_edge_list_synset['edge_id'].value_counts())
+selected_edge_list_synset = selected_edge_list_synset[selected_edge_list_synset['edge_id']>limit]
+selected_edge_list_synset = list(selected_edge_list_synset.index)
+master_edge_list_synset.drop(master_edge_list_synset.index, inplace=True) #Drop the dataframe here to preserve system resources
+        
+# Translate document text into a synset edges representation
+def edge_translation_synset(text):
+    doc_translation = ""
+    doc_touples = touple_edge_extractor_synset(text)
+    for t in doc_touples:
+        temp_t = str(t[0])+str(t[1])
+        doc_translation = doc_translation +" "+temp_t
+    return(doc_translation)
+
+data['edge_translation_synset']=data.apply(lambda row: edge_translation_synset(row['essay']), axis=1)
+
+# Train and run the sklearn vectorizor to get a sparse matrix representation
+count_vec_edges_synset = sklearn.feature_extraction.text.CountVectorizer(vocabulary=selected_edge_list_synset, lowercase=False)
+count_matrix_edges_synset = count_vec_edges_synset.fit_transform(data['edge_translation'])
+
+# Convert the sparse SciPy matrix into a dense matrix and convert intoa a pandas dataframe for further analysis
+edges_matrix_features_synset = pd.DataFrame(count_matrix_edges_synset.todense(), columns=selected_edge_list_synset)
+
+
+################################## Synset - Document Network Creation ##########################################     
+
 # Synset Betweeness Centrality
+
+# Create Betweeness Centrality Dataframe
+synset_centrality_matrix = pd.DataFrame()
+
+# Populate DataFrame with betweenness centralities 
+
+for index, row in data.iterrows():
+    
+    # Extract all edges from the docuemnt as touples
+    doc_edges = touple_edge_extractor_synset(row['essay'])
+    
+    # Create a graph using all the edge inputs as touples
+    G = nx.Graph()
+    G.add_edges_from(doc_edges)
+    btwn_dict = nx.betweenness_centrality(G)
+    Node_list = set(G.nodes())
+    Node_list = list(Node_list & set(selected_features))
+    temp_dict = {}
+    for n in Node_list:
+        col = str(n)+"_btw"
+        temp_dict[col]= btwn_dict[n]
+    synset_centrality_matrix = word_centrality_matrix.append(temp_dict,ignore_index=True)
+        
+
