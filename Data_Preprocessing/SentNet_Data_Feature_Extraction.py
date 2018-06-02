@@ -10,6 +10,7 @@ Created on Fri May 25 23:17:02 2018
 import pandas as pd
 import itertools
 import sklearn
+import networkx as nx
 from SentNet_Data_Prep_Functions import Ingest_Training_Data
 from Goldberg_Perceptual_Hashing import ImageSignature
 gis = ImageSignature()
@@ -186,7 +187,7 @@ synset_matrix_features = count_matrix_syn[selected_features_syn]
 sent_tokenize = nltk.tokenize.punkt.PunktSentenceTokenizer()
 
 # Break document into sentences, then word tokens, return all combinations of tokens
-def edge_extractor(text):
+def pd_edge_extractor(text):
     doc_edge_list = pd.DataFrame(columns=['Item_A','Item_B'])
     sent_list = sent_tokenize.tokenize(text)
     for sent in sent_list:
@@ -195,39 +196,27 @@ def edge_extractor(text):
         doc_edge_list = doc_edge_list.append(pd.DataFrame(list(edge_list),columns=['Item_A','Item_B']), ignore_index=True)
     return(doc_edge_list)
 
+def touple_edge_extractor(text):
+    doc_edge_list = []
+    sent_list = sent_tokenize.tokenize(text)
+    for sent in sent_list:
+        term_list = sorted(clean_words(sent))
+        edge_list = list(itertools.combinations(term_list, 2))
+        doc_edge_list.extend(edge_list)
+    return(doc_edge_list)
+
+# Get the edge counts for all sentences in all documents
+# test = data.apply(lambda row: edge_extractor(row['essay']),axis=1) # Doesn't work for some reason
+
 # Get the edge counts for all sentences in all documents
 master_edge_list = pd.DataFrame(columns=['Item_A','Item_B'])
-
 for index, row in data.iterrows():
-    master_edge_list = master_edge_list.append(edge_extractor(row['essay']), ignore_index=True)
-
-
-
-
-        
-        
-        
-
-
-
-
-
-
-
-# Wordnet Notes
-word_1 = 'rocket'
-word_2 = 'missle'
-
-word_1 = wn.synsets('rocket')
-for synset in word_1:
-    print(synset.definition())
-
-word_2 = wn.synsets('missile')
-for synset in word_2:
-    print(synset.definition())
-
-word_1 = word_1[0]
-word_1.hypernym_paths()
-
-word_2 = word_2[0]
-word_2.hypernym_paths()
+    
+    # Create Document Specific Network
+    doc_edges = touple_edge_extractor(row['essay'])
+    G = nx.Graph()
+    G.add_edges_from(doc_edges)
+    Node_list = list(G.nodes()) 
+    
+    
+    master_edge_list = master_edge_list.append(row['edge_list'], ignore_index=True)
