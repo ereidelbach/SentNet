@@ -17,13 +17,16 @@ Submissions to the challenge were judged against their ability to evaluate analy
 * Make sound judgments and assertions.
 * Incorporate effective visual information where appopriate.
 
-SentNet was created in partnership with [Taylor Corbett](https://github.com/data4d).
+SentNet was created by [Taylor Corbett](https://github.com/data4d) and [Eric Reidelbach](https://github.com/ereidelbach).
 
 ----
 
 # SentNet Description
 
-TBD
+SentNet is a next generation document analysis tool that utilizes advanced part-of-speech
+tagging and graph analysis techniques to rapidly evaluate and numerically score
+intelligence products against one (or multiple) criteria with no intervention while allowing
+analysts to easily validate scores using an intuitive user interface.
 
 ----
 
@@ -44,21 +47,22 @@ Setnet was developed on a system with the following resources. When attempting t
 
 The following packages are required to run SentNet's in python:
 
-* os
-* re
-* sys
-* zipfile
 * argparse
-* xml.etree.ElementTree
-* pandas
-* numpy
+* docx
 * itertools
-* sklearn
 * networkx
 * nltk
 * nltk - wordnet (requires a separate download using the nltk downloader)
 * nlkt - stopwords (requires a separate download using the nltk downloader)
 * nltk - word_tokenizer (requires a separate download using the nltk downloader)
 * nltk - PunktSentenceTokenizer (requires a separate download using the nltk downloader)
+* numpy
+* os
+* pandas
+* re
+* sklearn
+* sys
+* xml.etree.ElementTree
+* zipfile
 
 
