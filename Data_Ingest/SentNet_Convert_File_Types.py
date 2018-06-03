@@ -84,17 +84,17 @@ def convert2txt(data, col_names, setnum):
 os.chdir(r'C:\MSA\Projects\SentNet\Data')
 
 # Read in Training Data for scoring
-df = pd.read_csv('training_set_rel3.csv', encoding = "ISO-8859-1")
+df = pd.read_csv('training_set_rel3.csv', encoding = 'windows-1252')
 
 # We're going to focus on set 7 and set 8 as that has the most information (i.e. scores)
 #   Extract sets 7 and 8 and remove any columns that don't have relevant info
 df7 = df[df['essay_set'] == 7]
 df7 = df7.dropna(thresh=0.8*len(df7), axis=1)
-df7.to_csv('Set7/training_set_rel3_set7.csv', index='False')
+df7.to_csv('Set7/training_set_rel3_set7.csv', encoding = 'utf-8-sig', index='False')
 
 df8 = df[df['essay_set'] == 8]
 df8 = df8.dropna(thresh=0.8*len(df8), axis=1)
-df8.to_csv('Set8/training_set_rel3_set8.csv', index='False')
+df8.to_csv('Set8/training_set_rel3_set8.csv', encoding = 'utf-8-sig', index='False')
 
 # Write the contents of Set 7 to individual .docx and .txt documents
 columns = list(df7.columns)

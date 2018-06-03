@@ -44,4 +44,15 @@ os.chdir(r'C:\MSA\Projects\SentNet\Data')
 root = tkinter.Tk()
 root.title('SentNet: Readability Score System')
 
+button1 = tkinter.Button(root, text='button1')
+button2 = tkinter.Button(root, text='button2')
+
+text = tkinter.Entry(root)
+listbox = tkinter.Listbox(root)
+
+text.pack()
+button1.pack()
+button2.pack()
+listbox.pack()
+
 root.mainloop()

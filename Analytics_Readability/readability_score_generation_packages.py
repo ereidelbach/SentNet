@@ -33,7 +33,7 @@ Created on Mon May 28 17:54:21 2018
 import os
 import pandas as pd
 import spacy
-#spacy.load('en')
+spacy.load('en')
 from textstat.textstat import textstat
 from textatistic import Textatistic
 import textacy
@@ -137,6 +137,8 @@ def textstat_scores(document):
             syllables, and sentences
 '''
 def textacy_scores(document):
+    document = document_list[0]
+    document = document.encode('ascii', 'namereplace').decode('utf-8')
     doc = textacy.Doc(document)
     ts = textacy.TextStats(doc)
     document_dict = {}
@@ -169,7 +171,7 @@ def textacy_scores(document):
 os.chdir(r'C:\MSA\Projects\SentNet\Data')
 
 # Read in Training Data Set 7 for scoring
-df = pd.read_csv('Set7/training_set_rel3_set7.csv', encoding = "ISO-8859-1",
+df = pd.read_csv('Set7/training_set_rel3_set7.csv', encoding = "utf-8",
                  index_col = 0)
 
 document_list = list(df['essay'])
@@ -186,7 +188,7 @@ for document in document_list:
     #   textatistic, textstat, and textacy
     document_dict['textatistic'] = textatistic_scores(document)
     document_dict['textstat'] = textstat_scores(document)
-    #document_dict['textacy'] = textacy_scores(document)
+    document_dict['textacy'] = textacy_scores(document)
     
     # store the results
     score_list.append(document_dict)
