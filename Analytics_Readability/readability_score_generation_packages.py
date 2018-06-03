@@ -18,8 +18,11 @@ Created on Mon May 28 17:54:21 2018
     - TextStat Python Package
         https://pypi.org/project/textstat/
     - Textacy Python Package
-        Requires the `en` library: python -m spacy download en
-        Must run as administrator if on Windows
+        Requires the `en` library which can be installed via the command:
+            `python -m spacy download en`
+            ** Must run as administrator if on Windows
+        Textacy can be installed via the Anaconda prompt on Windows:
+            `conda install -c conda-forge textacy `
         
 :TODO:
 """
@@ -27,10 +30,10 @@ Created on Mon May 28 17:54:21 2018
 #==============================================================================
 # Package Import
 #==============================================================================
-import os   
+import os
 import pandas as pd
 import spacy
-spacy.load('en')
+#spacy.load('en')
 from textstat.textstat import textstat
 from textatistic import Textatistic
 import textacy
@@ -55,9 +58,9 @@ import textacy
             syllables, and sentences
 '''
 def textatistic_scores(document):
+    document_dict = {}
     try:
         s = Textatistic(document)
-        document_dict = {}
         document_dict['count_sent'] = s.sent_count
         document_dict['count_sybl'] = s.sybl_count
         document_dict['count_word'] = s.word_count
@@ -162,17 +165,20 @@ def textacy_scores(document):
 #==============================================================================
 
 # Set the project working directory
-os.chdir(r'E:\Projects\SentNet\Data')
+#os.chdir(r'E:\Projects\SentNet\Data')
+os.chdir(r'C:\MSA\Projects\SentNet\Data')
 
-# Read in Training Data for scoring
-df = pd.read_csv('training_set_rel3.csv', encoding = "ISO-8859-1")
+# Read in Training Data Set 7 for scoring
+df = pd.read_csv('Set7/training_set_rel3_set7.csv', encoding = "ISO-8859-1",
+                 index_col = 0)
+
 document_list = list(df['essay'])
 
 # Create a list for storing the scores of every document in this training set
 score_list = []
 
 # Compute scores with both Textatistic and Textstat
-for document in document_list[0:5]:
+for document in document_list:
     document_dict = {}
     document_dict['text'] = document
     
@@ -180,7 +186,7 @@ for document in document_list[0:5]:
     #   textatistic, textstat, and textacy
     document_dict['textatistic'] = textatistic_scores(document)
     document_dict['textstat'] = textstat_scores(document)
-    document_dict['textacy'] = textacy_scores(document)
+    #document_dict['textacy'] = textacy_scores(document)
     
     # store the results
     score_list.append(document_dict)
