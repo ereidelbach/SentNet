@@ -16,6 +16,7 @@ Created on Sat Jun  2 14:53:55 2018
     - Python-Docx library (install python-docx)
     
 :TODO:
+    NONE
 """
 
 #==============================================================================
@@ -28,7 +29,8 @@ import docx
 #==============================================================================
 # Function Definitions / Reference Variable Declaration
 #==============================================================================
-'''
+def convert2docx(data, col_names, setnum):
+    '''
     Description:
         - This function will take the passed in string from a row in a .xlsx
             or .csv file and create a new .docx file containing only this string        
@@ -40,8 +42,7 @@ import docx
     Output:
         - a .docx file will be written to the /Data/txt subfolder within the
             main project working folder
-'''    
-def convert2docx(data, col_names, setnum):
+    '''
     # create the .docx file
     doc = docx.Document()
     
@@ -50,10 +51,15 @@ def convert2docx(data, col_names, setnum):
         doc.add_heading(col_names[i], 2)
         doc.add_paragraph(str(data[i]))
     
+    # check to make sure a `docx` folder exists in the target directory
+    if os.path.isdir(setnum + '/docx') == False:
+        os.makedirs(str(setnum)+'/docx')
+    
     # save the created .docx file
     doc.save(setnum + '/docx/' + str(data['essay_id']) + '.docx')
 
-'''
+def convert2txt(data, col_names, setnum):
+    '''
     Description:
         - This function will take the passed in string from a row in a .xlsx
             or .csv file and create a new .txt file containing only this string
@@ -66,8 +72,10 @@ def convert2docx(data, col_names, setnum):
     Output: 
         - a .txt file will be written to the /Data/txt subfolder within the
             main project working folder
-'''    
-def convert2txt(data, col_names, setnum):
+    '''        
+    if os.path.isdir(setnum + '/txt') == False:
+        os.makedirs(str(setnum)+'/txt')
+    
     filename = setnum + '/txt/' + str(data['essay_id']) + '.txt'
     with open(filename, "w", encoding = 'utf-8') as my_output_file:
         for i in range(0, len(data)):
@@ -79,9 +87,8 @@ def convert2txt(data, col_names, setnum):
 #==============================================================================
 
 # Set the project working directory
-# Set the project working directory
-#os.chdir(r'E:\Projects\SentNet\Data')
-os.chdir(r'C:\MSA\Projects\SentNet\Data')
+os.chdir(r'E:\Projects\SentNet\Data')
+#os.chdir(r'C:\MSA\Projects\SentNet\Data')
 
 # Read in Training Data for scoring
 df = pd.read_csv('training_set_rel3.csv', encoding = 'windows-1252')
