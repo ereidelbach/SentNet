@@ -1,7 +1,12 @@
 # Ignore all .docx files in the Set7 and Set8 folders
 Data/Set7/docx/*.docx
+Data/Set7/docx/Images/*.docx
 Data/Set8/docx/*.docx
+Data/Set8/docx/Images/*.docx
 
 # Ignore all .txt files in the Set7 and Set8 folders
 Data/Set7/txt/*.txt
 Data/Set8/txt/*.txt
+
+# Ignore any __pycache__folders
+__pycache__

@@ -21,10 +21,9 @@ Created on Sun Jun 10 16:29:34 2018
             * raterX_traitY: each rater may score specific traits about each essay
 
 :REQUIRES:
-    - This script requires the docx2txt package:
-        https://github.com/ankushshah89/python-docx2txt
-    - The package can be installed via the command:
-        'pip install docx2txt
+    - docx2txt package (https://github.com/ankushshah89/python-docx2txt)
+        * install via the command: 'pip install docx2txt'
+        * import library via the command: ' import docx2txt
     
 :TODO:
     NONE
@@ -55,6 +54,9 @@ def ingest_files(path):
     file_list = []
     # go through every file in the specified path
     for filename in os.listdir(path):
+        # ignore any folders in the directory by only reading in files
+        if '.' not in filename:
+            continue
         # create a dictionary for each document and a list for storing 
         #   pieces of each document during ingest
         doc_dict = {}
@@ -82,7 +84,8 @@ def ingest_files(path):
                 doc_dict[key] = value
         else:
             # account for different file types
-            print ('Unknown file type detected.  SentNet can only ingest .txt'\
+            print ('Filename ' + filename + ' experienced an error.' +
+                   'Unknown file type detected.  SentNet can only ingest .txt'\
                    ', .docx, .xlsx, .xls, or .csv file types.')
             continue
         # store the dictionary in a list

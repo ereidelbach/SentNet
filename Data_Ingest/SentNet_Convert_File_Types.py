@@ -13,7 +13,9 @@ Created on Sat Jun  2 14:53:55 2018
         row in the .xlsx files.
     
 :REQUIRES:
-    - Python-Docx library (install python-docx)
+    - Python-Docx package (https://python-docx.readthedocs.io/en/latest/)
+        * install via the command:  'pip install python-docx'
+        * call library via the command: 'import docx'
     
 :TODO:
     NONE
@@ -96,10 +98,14 @@ df = pd.read_csv('training_set_rel3.csv', encoding = 'windows-1252')
 # We're going to focus on set 7 and set 8 as that has the most information (i.e. scores)
 #   Extract sets 7 and 8 and remove any columns that don't have relevant info
 df7 = df[df['essay_set'] == 7]
+df7.reset_index(inplace=True)
+del df7['index']
 df7 = df7.dropna(thresh=0.8*len(df7), axis=1)
 df7.to_csv('Set7/training_set_rel3_set7.csv', encoding = 'utf-8-sig', index='False')
 
 df8 = df[df['essay_set'] == 8]
+df8.reset_index(inplace=True)
+del df8['index']
 df8 = df8.dropna(thresh=0.8*len(df8), axis=1)
 df8.to_csv('Set8/training_set_rel3_set8.csv', encoding = 'utf-8-sig', index='False')
 
