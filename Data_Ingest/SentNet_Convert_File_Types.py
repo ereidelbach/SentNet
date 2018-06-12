@@ -89,7 +89,7 @@ def convert2txt(data, col_names, setnum):
 #==============================================================================
 
 # Set the project working directory
-os.chdir(r'E:\Projects\SentNet\Data')
+#os.chdir(r'E:\Projects\SentNet\Data')
 #os.chdir(r'C:\MSA\Projects\SentNet\Data')
 
 # Read in Training Data for scoring
@@ -115,7 +115,7 @@ for index, row in df7.iterrows():
     convert2docx(row, columns, 'Set7')
     convert2txt(row, columns, 'Set7')
     if index%100 == 0:
-        print(index)
+        print('Finished with: ' + str(index) + 'files from Set7')
 
 # Write the contents of Set 8 to individual .docx and .txt documents
 columns = list(df8.columns)    
@@ -123,4 +123,4 @@ for index, row in df8.iterrows():
     convert2docx(row, columns, 'Set8')
     convert2txt(row, columns, 'Set8')
     if index%100 == 0:
-        print(index)
+        print('Finished with: ' + str(index) + 'files from Set8')
