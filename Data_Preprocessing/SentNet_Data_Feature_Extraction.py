@@ -8,7 +8,8 @@ Created on Fri May 25 23:17:02 2018
 ####################################################################################
 ################################## Set-up ##########################################
 ####################################################################################
-
+import time
+start = time.time()
 # Import the required packages
 import pandas as pd
 import numpy as np
@@ -56,7 +57,7 @@ punctuations = '''!()-[]{};:'"\,<>/?@#$%^&*_~'''
 ###############################################################################################
 
 ################################## .Docx Data Ingest ##########################################
-
+'''
 # Specify a folder that contains the training document in .docx format
 doc_folder_path = "C:\\Users\\GTayl\\Desktop\\Visionist\\SentNet\\Data\\Example_Docs"
 img_dir = "C:\\Users\\GTayl\\Desktop\\Visionist\\SentNet\\Photos\\test_photos"
@@ -71,7 +72,10 @@ data = pd.DataFrame.from_csv(traing_data, sep='\t', header=0, encoding='ISO-8859
 
 # Select any subset (Scorecard) that you want to use for training
 data = data[data['essay_set']==1]
-
+print("Done Data Injest")
+time1 = time.time()
+print(time1-start)
+'''
 ###############################################################################################
 #################################### Data Cleaning ############################################
 ###############################################################################################
@@ -125,7 +129,7 @@ def clean_sentence(text):
         else:
             string += (" "+i)
     return(string)
-    
+ 
 ###############################################################################################
 ########################## Document Features & Readability Tests ##############################
 ############################################################################################### 
@@ -134,24 +138,36 @@ XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 '''
 
 # Create a copy of our original data pull to append to
+def Readability_Features(data, target):
+    
+    '''
+    Purpose:
+        
+    Input:
+        
+    Output:
+    '''
+    
+    doc_readability_features = pd.DataFrame()
+    
+    # Extract measures for each document
+    for index, row in data.iterrows():
+        
+        # Call feature generation functions
+        temp_textatistic = pd.DataFrame(textatistic_scores(row[target]), index=[0])
+        temp_textstat = pd.DataFrame(textstat_scores(row[target]), index=[0])
+        #textacy = pd.DataFrame(textacy_scores(row['essay']), index=[0])
+        
+        # Join document features into a temporary dataframe
+        temp_df_row = pd.concat([temp_textatistic,temp_textstat], axis=1, join='inner')
+        
+        # Append temporary dataframe to the master doc_readability_features dataframe
+        doc_readability_features = doc_readability_features.append(temp_df_row, ignore_index=True)
+    
+    print("Done Readability Tests")
+    return(doc_readability_features)
 
-doc_readability_features = pd.DataFrame()
-
-# Extract measures for each document
-for index, row in data.iterrows():
-    
-    # Call feature generation functions
-    temp_textatistic = pd.DataFrame(textatistic_scores(row['essay']), index=[0])
-    temp_textstat = pd.DataFrame(textstat_scores(row['essay']), index=[0])
-    #textacy = pd.DataFrame(textacy_scores(row['essay']), index=[0])
-    
-    # Join document features into a temporary dataframe
-    temp_df_row = pd.concat([temp_textatistic,temp_textstat], axis=1, join='inner')
-    
-    # Append temporary dataframe to the master doc_readability_features dataframe
-    doc_readability_features = doc_readability_features.append(temp_df_row, ignore_index=True)
-    
-    
+  
 ###############################################################################################
 ############################## Word Feature Extraction ########################################
 ############################################################################################### 
@@ -166,38 +182,46 @@ Output: A dense document (n) by word (w) (n x w) matrix that contains the freque
         A limit parameter of 0.01 means that a word must appear in at least 1% of documents to be included in the term matrix.
         This helps to remove extreamly rare features (as well as mispellings) that will provide little value during the modeling process.
 '''
-
-# Obtains a set of unique words in our corpus
-unqiue_words = set()
-
-for index, row in data.iterrows():
-    temp_words = set(clean_words(row['essay']))
-    unqiue_words = unqiue_words.union(temp_words)
-
-# Sklearn Matrix Builder
+def Word_Features(data, target, limit):
     
-# Append a new column to our original dataframe with a "cleaned" version of the document text
-data['essay_clean'] = data.apply(lambda row: clean_sentence(row['essay']),axis=1)
-
-# Define the vocab list for the Sklearn vecotrizer to search over
-unique_words = list(unqiue_words)
-
-# Train and run the sklearn vectorizor against the cleaned documents to get a sparse matrix representation
-count_vec = sklearn.feature_extraction.text.CountVectorizer(vocabulary=unique_words,lowercase=False)
-count_matrix = count_vec.fit_transform(data['essay_clean'])
-
-# Convert the sparse SciPy matrix into a dense matrix and convert intoa a pandas dataframe for further analysis
-count_matrix = pd.DataFrame(count_matrix.todense(),columns=unique_words)
-term_frequency_counts = pd.DataFrame(count_matrix.apply(lambda column: sum(column)),columns=['Counts'])
-
-# Define the minimum threshold to observe a term for it to be included in our analysis
-limit = round(0.01*len(count_matrix))
-
-# Subset the count_matrix to only inlcude terms that appear more than the specified limit
-selected_features = term_frequency_counts[term_frequency_counts['Counts']>limit]
-selected_features = selected_features.index
-word_matrix_features = count_matrix[selected_features]
-
+    '''
+    Purpose:
+        
+    Input:
+        
+    Output:
+    '''
+    
+    # Obtains a set of unique words in our corpus
+    unqiue_words = set()
+    
+    for index, row in data.iterrows():
+        temp_words = set(clean_words(row[target]))
+        unqiue_words = unqiue_words.union(temp_words)
+    
+    # Sklearn Matrix Builder
+        
+    # Append a new column to our original dataframe with a "cleaned" version of the document text
+    data['essay_clean'] = data.apply(lambda row: clean_sentence(row[target]),axis=1)
+    
+    # Define the vocab list for the Sklearn vecotrizer to search over
+    unique_words = list(unqiue_words)
+    
+    # Train and run the sklearn vectorizor against the cleaned documents to get a sparse matrix representation
+    count_vec = sklearn.feature_extraction.text.CountVectorizer(vocabulary=unique_words,lowercase=False)
+    count_matrix = count_vec.fit_transform(data['essay_clean'])
+    
+    # Convert the sparse SciPy matrix into a dense matrix and convert intoa a pandas dataframe for further analysis
+    count_matrix = pd.DataFrame(count_matrix.todense(),columns=unique_words)
+    term_frequency_counts = pd.DataFrame(count_matrix.apply(lambda column: sum(column)),columns=['Counts'])
+    
+    # Subset the count_matrix to only inlcude terms that appear more than the specified limit
+    selected_words = term_frequency_counts[term_frequency_counts['Counts']>limit]
+    selected_words = selected_words.index
+    word_matrix_features = count_matrix[selected_words]
+    
+    print("Done Word Features")
+    return({'word_matrix_features':word_matrix_features, 'selected_words':selected_words})
 
 ###############################################################################################
 ############################# Synset Feature Generation #######################################
@@ -254,26 +278,10 @@ def WordNet_Translator(term):
     return(hypernym_list)
 
 
-# Return ths Hypernym code (as a string) for each hypernym in the path
-def return_hypernym_codes(hypernym_list):
-    '''
-    Purpose:
-        
-    Input:
-        
-    Output:
-    '''
-    
-    hypernym_codes = []
-    for hypernym in hypernym_list:
-        hypernym_codes.append(str(hypernym.name()).replace(".","")) #removing periods for now
-    return(hypernym_codes)
-
-
 # Building a Synset Translation for each essay
 punctuations = '''!()-[]{};.:'"\,<>/?@#$%^&*_~'''
 
-def synset_translated_sentence(text):
+def synset_translated_string(text):
     '''
     Purpose:
         
@@ -293,39 +301,48 @@ def synset_translated_sentence(text):
 
 
 ########################## Synset Translation & Extraction ####################################
-     
-# Unique synsets in corpus
-unique_synsets = set() 
-
-for index, row in data.iterrows():
-    temp_words = set(clean_words(row['essay']))
-    for word in temp_words:
-        temp_synsets = WordNet_Translator(word)
-        if len(temp_synsets)>0:
-            unique_synsets = unique_synsets.union(temp_synsets)
-        else:
-            pass
-
-# Building a Synset Translation for each essay
-data['essay_synset_translation'] = data.apply(lambda row: synset_translated_sentence(row['essay']),axis=1)
-
-# develop the vocab list for the methods to search over
-unique_synsets = list(unique_synsets)
-
-# Train and run the sklearn vectorizor to get a sparse matrix representation
-count_vec_syn = sklearn.feature_extraction.text.CountVectorizer(vocabulary=unique_synsets,lowercase=False,)
-count_matrix_syn = count_vec_syn.fit_transform(data['essay_synset_translation'])
-
-# Convert the sparse SciPy matrix into a dense matrix and convert intoa a pandas dataframe for further analysis
-count_matrix_syn = pd.DataFrame(count_matrix_syn.todense(),columns=unique_synsets)
-synset_frequency_counts = pd.DataFrame(count_matrix_syn.apply(lambda column: sum(column)),columns=['Counts'])
-
-# Define the minimum threshold to observe a item (word or synset) for it to be included in our analysis
-limit = round(0.01*len(count_matrix_syn))
-selected_features_syn = synset_frequency_counts[synset_frequency_counts['Counts']>limit]
-selected_features_syn = selected_features_syn.index
-synset_matrix_features = count_matrix_syn[selected_features_syn]
-
+def Synset_Features(data, target, limit): 
+    '''
+    Purpose:
+        
+    Input:
+        
+    Output:
+    '''
+    
+    # Unique synsets in corpus
+    unique_synsets = set() 
+    
+    for index, row in data.iterrows():
+        temp_words = set(clean_words(row[target]))
+        for word in temp_words:
+            temp_synsets = WordNet_Translator(word)
+            if len(temp_synsets)>0:
+                unique_synsets = unique_synsets.union(temp_synsets)
+            else:
+                pass
+    
+    # Building a Synset Translation for each essay
+    data['essay_synset_translation'] = data.apply(lambda row: synset_translated_string(row[target]),axis=1)
+    
+    # develop the vocab list for the methods to search over
+    unique_synsets = list(unique_synsets)
+    
+    # Train and run the sklearn vectorizor to get a sparse matrix representation
+    count_vec_syn = sklearn.feature_extraction.text.CountVectorizer(vocabulary=unique_synsets,lowercase=False,)
+    count_matrix_syn = count_vec_syn.fit_transform(data['essay_synset_translation'])
+    
+    # Convert the sparse SciPy matrix into a dense matrix and convert intoa a pandas dataframe for further analysis
+    count_matrix_syn = pd.DataFrame(count_matrix_syn.todense(),columns=unique_synsets)
+    synset_frequency_counts = pd.DataFrame(count_matrix_syn.apply(lambda column: sum(column)),columns=['Counts'])
+    
+    # Define the minimum threshold to observe a item (word or synset) for it to be included in our analysis
+    selected_synsets = synset_frequency_counts[synset_frequency_counts['Counts']>limit]
+    selected_synsets = selected_synsets.index
+    synset_matrix_features = count_matrix_syn[selected_synsets]
+    
+    print("Done Synset Generation")
+    return({"synset_matrix_features":synset_matrix_features, "selected_synsets":selected_synsets})
 
 ###############################################################################################
 ############################ Word Graph Feature Generation ####################################
@@ -392,55 +409,76 @@ def edge_translation(text):
     return(doc_translation)
 
 ######################### Word - Edge Feature Extraction ############################
-
-# Get the edge counts for all sentences in all documents
-master_edge_list = pd.DataFrame(columns=['Item_A','Item_B'])
-for index, row in data.iterrows():
-    doc_edges = pd_edge_extractor(row['essay'])
-    master_edge_list = master_edge_list.append(doc_edges, ignore_index=True)
-
-# Calculate which edges are the most common among the documents to collect counts for
-master_edge_list['edge_id'] = master_edge_list.Item_A.str.cat(master_edge_list.Item_B)
-selected_edge_list = pd.DataFrame(master_edge_list['edge_id'].value_counts())
-selected_edge_list = selected_edge_list[selected_edge_list['edge_id']>limit]
-selected_edge_list = list(selected_edge_list.index)
-
-# Translate document text into edges representation
-data['edge_translation']=data.apply(lambda row: edge_translation(row['essay']), axis=1)
-
-# Train and run the sklearn vectorizor to get a sparse matrix representation
-count_vec_edges = sklearn.feature_extraction.text.CountVectorizer(vocabulary=selected_edge_list, lowercase=False)
-count_matrix_edges = count_vec_edges.fit_transform(data['edge_translation'])
-
-# Convert the sparse SciPy matrix into a dense matrix and convert intoa a pandas dataframe for further analysis
-edges_matrix_features = pd.DataFrame(count_matrix_edges.todense(), columns=selected_edge_list)
+def Word_Edge_Features(data, target, limit):
+    '''
+    Purpose:
+        
+    Input:
+        
+    Output:
+    '''
+    
+    # Get the edge counts for all sentences in all documents
+    master_edge_list = pd.DataFrame(columns=['Item_A','Item_B'])
+    for index, row in data.iterrows():
+        doc_edges = pd_edge_extractor(row[target])
+        master_edge_list = master_edge_list.append(doc_edges, ignore_index=True)
+    
+    # Calculate which edges are the most common among the documents to collect counts for
+    master_edge_list['edge_id'] = master_edge_list.Item_A.str.cat(master_edge_list.Item_B)
+    selected_edge_list = pd.DataFrame(master_edge_list['edge_id'].value_counts())
+    selected_edge_list = selected_edge_list[selected_edge_list['edge_id']>limit]
+    selected_edge_list = list(selected_edge_list.index)
+    
+    # Translate document text into edges representation
+    data['edge_translation']=data.apply(lambda row: edge_translation(row[target]), axis=1)
+    
+    # Train and run the sklearn vectorizor to get a sparse matrix representation
+    count_vec_edges = sklearn.feature_extraction.text.CountVectorizer(vocabulary=selected_edge_list, lowercase=False)
+    count_matrix_edges = count_vec_edges.fit_transform(data['edge_translation'])
+    
+    # Convert the sparse SciPy matrix into a dense matrix and convert intoa a pandas dataframe for further analysis
+    edges_matrix_features = pd.DataFrame(count_matrix_edges.todense(), columns=selected_edge_list)
+    
+    print('Done with Word Edge Features')
+    return(edges_matrix_features)
 
 
 #################### Word - Betweeness Centrality Extraction #######################        
 
-# Term/Word Betweeness Centrality
+def Word_Centrality_Features(data, target, selected_words):
+    '''
+    Purpose:
+        
+    Input:
+        
+    Output:
+    '''
 
-# Create Betweeness Centrality Dataframe
-word_centrality_matrix = pd.DataFrame()
-
-# Populate DataFrame with betweenness centralities 
-
-for index, row in data.iterrows():
+    # Create Betweeness Centrality Dataframe
+    word_centrality_matrix = pd.DataFrame()
     
-    # Extract all edges from the docuemnt as touples
-    doc_edges = touple_edge_extractor(row['essay'])
-    
-    # Create a graph using all the edge inputs as touples
-    G = nx.Graph()
-    G.add_edges_from(doc_edges)
-    btwn_dict = nx.betweenness_centrality(G)
-    Node_list = set(G.nodes())
-    Node_list = list(Node_list & set(selected_features))
-    temp_dict = {}
-    for n in Node_list:
-        col = str(n)+"_btw"
-        temp_dict[col]= btwn_dict[n]
-    word_centrality_matrix = word_centrality_matrix.append(temp_dict,ignore_index=True)
+    # Populate DataFrame with betweenness centralities 
+    for index, row in data.iterrows():
+        
+        # Extract all edges from the docuemnt as touples
+        doc_edges = touple_edge_extractor(row['essay'])
+        
+        # Create a graph using all the edge inputs as touples
+        G = nx.Graph()
+        G.add_edges_from(doc_edges)
+        btwn_dict = nx.betweenness_centrality(G)
+        Node_list = set(G.nodes())
+        Node_list = list(Node_list & set(selected_words))
+        temp_dict = {}
+        for n in Node_list:
+            col = str(n)+"_btw"
+            temp_dict[col]= btwn_dict[n]
+        word_centrality_matrix = word_centrality_matrix.append(temp_dict,ignore_index=True)
+
+    print("Done Word Graph Generation")
+    return(word_centrality_matrix)
+
         
 ###############################################################################################
 ############################ Synset Graph Feature Generation ##################################
@@ -524,56 +562,75 @@ def edge_translation_synset(text):
     return(doc_translation)
 
 ######################### Synset - Edge Feature Extraction ############################
+def Synset_Edge_Features(data, target, limit):
+    '''
+    Purpose:
+        
+    Input:
+        
+    Output:
+    '''
+    
+    # Get the synset edge counts for all sentences in all documents
+    master_edge_list_synset = pd.DataFrame(columns=['Synset_A','Synset_B'])
+    for index, row in data.iterrows():
+        doc_edges_synset = pd_edge_extractor_synset(row[target])
+        master_edge_list_synset = master_edge_list_synset.append(doc_edges_synset, ignore_index=True)
+    
+    # Calculate which synset edges are the most common among the documents to collect counts for
+    master_edge_list_synset['edge_id'] = master_edge_list_synset.Synset_A.str.cat(master_edge_list_synset.Synset_B)
+    selected_edge_list_synset = pd.DataFrame(master_edge_list_synset['edge_id'].value_counts())
+    selected_edge_list_synset = selected_edge_list_synset[selected_edge_list_synset['edge_id']>limit]
+    selected_edge_list_synset = list(selected_edge_list_synset.index)
+    master_edge_list_synset.drop(master_edge_list_synset.index, inplace=True) #Drop the dataframe here to preserve system resources
+    
+    # Translate document text into a synset edges representation
+    data['edge_translation_synset']=data.apply(lambda row: edge_translation_synset(row[target]), axis=1)
+    
+    # Train and run the sklearn vectorizor to get a sparse matrix representation
+    count_vec_edges_synset = sklearn.feature_extraction.text.CountVectorizer(vocabulary=selected_edge_list_synset, lowercase=False)
+    count_matrix_edges_synset = count_vec_edges_synset.fit_transform(data['edge_translation'])
+    
+    # Convert the sparse SciPy matrix into a dense matrix and convert intoa a pandas dataframe for further analysis
+    edges_matrix_features_synset = pd.DataFrame(count_matrix_edges_synset.todense(), columns=selected_edge_list_synset)
 
-# Get the synset edge counts for all sentences in all documents
-master_edge_list_synset = pd.DataFrame(columns=['Synset_A','Synset_B'])
-for index, row in data.iterrows():
-    doc_edges_synset = pd_edge_extractor_synset(row['essay'])
-    master_edge_list_synset = master_edge_list_synset.append(doc_edges_synset, ignore_index=True)
-
-# Calculate which synset edges are the most common among the documents to collect counts for
-master_edge_list_synset['edge_id'] = master_edge_list_synset.Synset_A.str.cat(master_edge_list_synset.Synset_B)
-selected_edge_list_synset = pd.DataFrame(master_edge_list_synset['edge_id'].value_counts())
-selected_edge_list_synset = selected_edge_list_synset[selected_edge_list_synset['edge_id']>limit]
-selected_edge_list_synset = list(selected_edge_list_synset.index)
-master_edge_list_synset.drop(master_edge_list_synset.index, inplace=True) #Drop the dataframe here to preserve system resources
-
-# Translate document text into a synset edges representation
-data['edge_translation_synset']=data.apply(lambda row: edge_translation_synset(row['essay']), axis=1)
-
-# Train and run the sklearn vectorizor to get a sparse matrix representation
-count_vec_edges_synset = sklearn.feature_extraction.text.CountVectorizer(vocabulary=selected_edge_list_synset, lowercase=False)
-count_matrix_edges_synset = count_vec_edges_synset.fit_transform(data['edge_translation'])
-
-# Convert the sparse SciPy matrix into a dense matrix and convert intoa a pandas dataframe for further analysis
-edges_matrix_features_synset = pd.DataFrame(count_matrix_edges_synset.todense(), columns=selected_edge_list_synset)
-
+    print("Done with Synset_Edge_Features")
+    return(edges_matrix_features_synset)
 
 #################### Synset - Betweeness Centrality Extraction #######################      
 
-# Synset Betweeness Centrality
-
-# Create Betweeness Centrality Dataframe
-synset_centrality_matrix = pd.DataFrame()
-
-# Populate DataFrame with betweenness centralities 
-for index, row in data.iterrows():
+def Synset_Centrality_Features(data, target, selected_synsets):
+    '''
+    Purpose:
+        
+    Input:
+        
+    Output:
+    '''
     
-    # Extract all edges from the docuemnt as touples
-    doc_edges = touple_edge_extractor_synset(row['essay'])
+    # Create Betweeness Centrality Dataframe
+    synset_centrality_matrix = pd.DataFrame()
     
-    # Create a graph using all the edge inputs as touples
-    G = nx.Graph()
-    G.add_edges_from(doc_edges)
-    btwn_dict = nx.betweenness_centrality(G)
-    Node_list = set(G.nodes())
-    Node_list = list(Node_list & set(selected_features_syn))
-    temp_dict = {}
-    for n in Node_list:
-        col = str(n)+"_btw"
-        temp_dict[col]= btwn_dict[n]
-    synset_centrality_matrix = synset_centrality_matrix.append(temp_dict,ignore_index=True)
-       
+    # Populate DataFrame with betweenness centralities 
+    for index, row in data.iterrows():
+        
+        # Extract all edges from the docuemnt as touples
+        doc_edges = touple_edge_extractor_synset(row[target])
+        
+        # Create a graph using all the edge inputs as touples
+        G = nx.Graph()
+        G.add_edges_from(doc_edges)
+        btwn_dict = nx.betweenness_centrality(G)
+        Node_list = set(G.nodes())
+        Node_list = list(Node_list & set(selected_synsets))
+        temp_dict = {}
+        for n in Node_list:
+            col = str(n)+"_btw"
+            temp_dict[col]= btwn_dict[n]
+        synset_centrality_matrix = synset_centrality_matrix.append(temp_dict,ignore_index=True)
+    
+    print("Done Synset Graph Generation")
+    return(synset_centrality_matrix)
 
 
 ###############################################################################################
@@ -592,3 +649,11 @@ word_centrality_matrix
 edges_matrix_features_synset
 synset_centrality_matrix
 '''   
+'''
+doc_readability_features.to_excel('C:\\Users\\GTayl\\Desktop\\Visionist\\SentNet\\Saved_Data\\doc_readability_features.xlsx')
+word_matrix_features.to_excel('C:\\Users\\GTayl\\Desktop\\Visionist\\SentNet\\Saved_Data\\word_matrix_features.xlsx')
+synset_matrix_features.to_excel('C:\\Users\\GTayl\\Desktop\\Visionist\\SentNet\\Saved_Data\\synset_matrix_features.xlsx')
+word_centrality_matrix.to_excel('C:\\Users\\GTayl\\Desktop\\Visionist\\SentNet\\Saved_Data\\word_centrality_matrix.xlsx')
+synset_centrality_matrix.to_excel('C:\\Users\\GTayl\\Desktop\\Visionist\\SentNet\\Saved_Data\\synset_centrality_matrix.xlsx')
+'''  
+    
