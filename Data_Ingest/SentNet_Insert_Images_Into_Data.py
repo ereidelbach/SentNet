@@ -35,6 +35,7 @@ Created on Sun Jun 10 18:23:08 2018
 #==============================================================================
 import docx2txt
 import docx
+from pathlib import Path
 import os   
 import random
 from Data_Ingest.SentNet_Docx_Txt_Ingest import ingest_files
@@ -62,8 +63,7 @@ def insert_image_into_docx(doc_dir_path, img_dir_path):
         - Nothing is returned by this function
         - This function will overwrite every .docx file with a new file
             containing 0-3 images
-    '''
-    
+    '''   
     # setup variables for use in the function
     imageTypeDict = {'0':[],
                  '1':['PieChart'],
@@ -76,17 +76,19 @@ def insert_image_into_docx(doc_dir_path, img_dir_path):
                  }
     
     # read in the filename of each image in the image directory into a list
+    img_dir_path = os.getcwd() / img_dir_path
     image_list = []
     for fname in os.listdir(img_dir_path):
-        image_list.append(os.path.join(img_dir_path, fname))
-        
+        image_list.append(img_dir_path / fname)
+
     # read in every .docx file in the specified path: `doc_dir_path
+    doc_dir_path = os.getcwd() / doc_dir_path
     doc_list = []
     file_list = []
     for filename in os.listdir(doc_dir_path):
         if filename.endswith('.docx'):
             file_list.append(filename)
-            doc_list.append(os.path.join(doc_dir_path, filename))
+            doc_list.append(doc_dir_path / filename)
         
     # read in the contents of each file into a dataframe so that we can compute
     #   the distribution of `domain_scores`
@@ -126,7 +128,7 @@ def insert_image_into_docx(doc_dir_path, img_dir_path):
         # inject the image(s) into the file under the header(s): Image1, Image2, etc.
         for image in insertedImagesList:
             try:
-                image_path = [x for x in image_list if image in x][0]
+                image_path = [str(x) for x in image_list if image in str(x)][0]
             except:
                 print(image)
             heading = 'Image ' + str(insertedImagesList.index(image)+1)
@@ -135,15 +137,11 @@ def insert_image_into_docx(doc_dir_path, img_dir_path):
     
         # check to make sure an image subfolder exists in the docx folder
         # if it doesn't, make it
-        if os.path.isdir(os.path.join(file_path.split(
-                '\docx')[0], 'docx', 'Images')) == False:
-            os.makedirs(os.path.join(file_path.split(
-                    '\docx')[0], 'docx', 'Images'))
-        #os.chdir(os.path.join(file_path.split('\docx')[0], 'docx', 'Images'))
+        if (file_path.parent / 'Images').is_dir() == False:
+            os.makedirs(file_path.parent / 'Images')
         
         # save the file
-        document.save(os.path.join(file_path.split(
-                '\docx')[0],'docx', 'Images',file_name))
+        document.save(file_path.parent/'Images'/file_name)
         
         # keep a counter going for progress
         if file_list.index(file_name)%100 == 0:
@@ -154,12 +152,14 @@ def insert_image_into_docx(doc_dir_path, img_dir_path):
 #==============================================================================
 
 # Set the project working directory
-os.chdir(r'E:\Projects\SentNet\Data_Ingest')
+#os.chdir(r'E:\Projects\SentNet\Data_Ingest')
+os.chdir(r'/home/ejreidelbach/projects/SentNet')
 
 # Inject images into every .docx file for Set7
-insert_image_into_docx('E:\Projects\SentNet\Data\Set7\docx',
-                       'E:\Projects\SentNet\Data\Images')
+doc_folder = Path("Data/Set7/docx")
+image_folder = Path("Data/Images")
+insert_image_into_docx(doc_folder, image_folder)
 
 # Inject images into every .docx file for Set8
-insert_image_into_docx('E:\Projects\SentNet\Data\Set7\docx',
-                       'E:\Projects\SentNet\Data\Images')
+doc_folder = Path("Data/Set8/docx")
+insert_image_into_docx(doc_folder, image_folder)

@@ -98,4 +98,4 @@ def ingest_files(path):
 #==============================================================================
 
 # Read in the contents of the specified path to a Pandas DataFrame
-df = ingest_files(r'E:\Projects\SentNet\Data\Set7\docx')
+#df = ingest_files(r'E:\Projects\SentNet\Data\Set7\docx')
