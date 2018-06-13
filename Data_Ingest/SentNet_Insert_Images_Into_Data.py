@@ -63,7 +63,11 @@ def insert_image_into_docx(doc_dir_path, img_dir_path):
         - Nothing is returned by this function
         - This function will overwrite every .docx file with a new file
             containing 0-3 images
-    '''   
+    '''       
+#    folder = 'Set4'
+#    doc_dir_path = Path('Data', folder, 'docx')
+#    img_dir_path = Path('Data','Images')    
+    
     # setup variables for use in the function
     imageTypeDict = {'0':[],
                  '1':['PieChart'],
@@ -76,13 +80,11 @@ def insert_image_into_docx(doc_dir_path, img_dir_path):
                  }
     
     # read in the filename of each image in the image directory into a list
-    img_dir_path = os.getcwd() / img_dir_path
     image_list = []
     for fname in os.listdir(img_dir_path):
         image_list.append(img_dir_path / fname)
 
-    # read in every .docx file in the specified path: `doc_dir_path
-    doc_dir_path = os.getcwd() / doc_dir_path
+    # read in every .docx file in the specified path: `doc_dir_path`
     doc_list = []
     file_list = []
     for filename in os.listdir(doc_dir_path):
@@ -95,7 +97,10 @@ def insert_image_into_docx(doc_dir_path, img_dir_path):
     docDF = ingest_files(doc_dir_path)
     # extract the scores, convert them to integers and sort them
     domain_scores = docDF['domain1_score'].value_counts().index.tolist()
-    domain_scores = sorted([int(x.split('.')[0]) for x in domain_scores])
+    try:
+        domain_scores = sorted([int(x.split('.')[0]) for x in domain_scores])
+    except:
+        docDF[docDF['domain1_score']=='nan']
         
     # iterate over every file in the list
     for file_name, file_path, in zip(file_list, doc_list):
@@ -145,21 +150,28 @@ def insert_image_into_docx(doc_dir_path, img_dir_path):
         
         # keep a counter going for progress
         if file_list.index(file_name)%100 == 0:
-            print('Done with ' + str(file_list.index(file_name)) + ' files.')
+            print('Done with ' + str(file_list.index(file_name)) + ' files in ' 
+                  + doc_dir_path.parts[1])
         
 #==============================================================================
 # Working Code
 #==============================================================================
 
 # Set the project working directory
-#os.chdir(r'E:\Projects\SentNet\Data_Ingest')
-os.chdir(r'/home/ejreidelbach/projects/SentNet')
+os.chdir(r'E:\Projects\SentNet')
+#os.chdir(r'/home/ejreidelbach/projects/SentNet')
+
+# for every folder in the list, inject images into every .docx file
+for folder in ['Set1', 'Set2', 'Set3', 'Set4', 'Set5', 'Set6', 'Set7', 'Set8']:
+    doc_folder = Path('Data', folder, 'docx')
+    image_folder = Path('Data','Images')
+    insert_image_into_docx(doc_folder, image_folder)
 
 # Inject images into every .docx file for Set7
-doc_folder = Path("Data/Set7/docx")
-image_folder = Path("Data/Images")
-insert_image_into_docx(doc_folder, image_folder)
-
-# Inject images into every .docx file for Set8
-doc_folder = Path("Data/Set8/docx")
-insert_image_into_docx(doc_folder, image_folder)
+#doc_folder = Path("Data/Set7/docx")
+#image_folder = Path("Data/Images")
+#insert_image_into_docx(doc_folder, image_folder)
+#
+## Inject images into every .docx file for Set8
+#doc_folder = Path("Data/Set8/docx")
+#insert_image_into_docx(doc_folder, image_folder)

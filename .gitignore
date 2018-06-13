@@ -1,10 +1,28 @@
 # Ignore all .docx files in the Set7 and Set8 folders
+Data/Set1/docx/*.docx
+Data/Set1/docx/Images/*.docx
+Data/Set2/docx/*.docx
+Data/Set2/docx/Images/*.docx
+Data/Set3/docx/*.docx
+Data/Set3/docx/Images/*.docx
+Data/Set4/docx/*.docx
+Data/Set4/docx/Images/*.docx
+Data/Set5/docx/*.docx
+Data/Set5/docx/Images/*.docx
+Data/Set6/docx/*.docx
+Data/Set6/docx/Images/*.docx
 Data/Set7/docx/*.docx
 Data/Set7/docx/Images/*.docx
 Data/Set8/docx/*.docx
 Data/Set8/docx/Images/*.docx
 
 # Ignore all .txt files in the Set7 and Set8 folders
+Data/Set1/txt/*.txt
+Data/Set2/txt/*.txt
+Data/Set3/txt/*.txt
+Data/Set4/txt/*.txt
+Data/Set5/txt/*.txt
+Data/Set6/txt/*.txt
 Data/Set7/txt/*.txt
 Data/Set8/txt/*.txt
 
