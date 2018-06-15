@@ -104,6 +104,7 @@ def convert2txt(data, col_names, setnum):
 # Set the project working directory
 #os.chdir(r'E:\Projects\SentNet\')
 #os.chdir(r'C:\MSA\Projects\SentNet\')
+os.chdir('/home/ejreidelbach/projects/SentNet')
 
 # Read in Training Data for scoring
 df = pd.read_csv(Path('Data','training_set_rel3.csv'), encoding = 'windows-1252')
