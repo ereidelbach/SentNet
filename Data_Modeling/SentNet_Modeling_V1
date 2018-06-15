@@ -55,7 +55,9 @@ data = data[data['essay_set']==1]
 
 # Select target
 target = 'rater1_domain1'
-model_data = pd.concat([doc_readability_features,synset_matrix_features,word_matrix_features,word_centrality_matrix,synset_centrality_matrix],axis=1)
+essay = pd.DataFrame(data['essay'])
+essay.columns = ['raw_essay']
+model_data = pd.concat([essay,doc_readability_features,synset_matrix_features,word_matrix_features,word_centrality_matrix,synset_centrality_matrix],axis=1)
 
 # replace any N/A's
 model_data = model_data.replace('N/A',0)
@@ -77,11 +79,16 @@ model_data = pd.concat([model_data, target_1, target_2, target_3],axis=1)
 # select the train and test splits
 train, test = train_test_split(model_data, test_size=0.2)
 
+# obtain document similarity features
+
+
+
 # select the model features
 modeling_features = list(test.columns)
 modeling_features.remove('rater1_domain1')
 modeling_features.remove('rater2_domain1')
 modeling_features.remove('domain1_score')
+modeling_features.remove('ESSAY')
 
 # train the model for feature selection
 rfc = RandomForestClassifier(n_estimators=1000, n_jobs=7)
@@ -151,5 +158,3 @@ print("Model Standard Error: "+str(std_error))
 ###############################################################################################
 ################################ Image Comparison & Scoring ###################################
 ###############################################################################################
-
-
