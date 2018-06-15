@@ -441,7 +441,7 @@ def Word_Edge_Features(data, target, limit):
     edges_matrix_features = pd.DataFrame(count_matrix_edges.todense(), columns=selected_edge_list)
     
     print('Done with Word Edge Features')
-    return(edges_matrix_features)
+    return({'edges_matrix_features':edges_matrix_features, 'master_edge_list':master_edge_list})
 
 
 #################### Word - Betweeness Centrality Extraction #######################        
@@ -582,7 +582,7 @@ def Synset_Edge_Features(data, target, limit):
     selected_edge_list_synset = pd.DataFrame(master_edge_list_synset['edge_id'].value_counts())
     selected_edge_list_synset = selected_edge_list_synset[selected_edge_list_synset['edge_id']>limit]
     selected_edge_list_synset = list(selected_edge_list_synset.index)
-    master_edge_list_synset.drop(master_edge_list_synset.index, inplace=True) #Drop the dataframe here to preserve system resources
+    #master_edge_list_synset.drop(master_edge_list_synset.index, inplace=True) #Drop the dataframe here to preserve system resources
     
     # Translate document text into a synset edges representation
     data['edge_translation_synset']=data.apply(lambda row: edge_translation_synset(row[target]), axis=1)
@@ -595,7 +595,7 @@ def Synset_Edge_Features(data, target, limit):
     edges_matrix_features_synset = pd.DataFrame(count_matrix_edges_synset.todense(), columns=selected_edge_list_synset)
 
     print("Done with Synset_Edge_Features")
-    return(edges_matrix_features_synset)
+    return({'edges_matrix_features_synset':edges_matrix_features_synset, 'master_edge_list_synset':master_edge_list_synset})
 
 #################### Synset - Betweeness Centrality Extraction #######################      
 
