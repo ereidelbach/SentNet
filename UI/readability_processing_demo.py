@@ -108,8 +108,8 @@ def action_analyze_files():
 #==============================================================================
 
 # Set the project working directory
-#os.chdir(r'C:\MSA\Projects\SentNet\Data')
-os.chdir(Path('/home','ejreidelbach','projects','SentNet'))
+os.chdir(Path("E:\Projects\SentNet"))
+#os.chdir(Path('/home','ejreidelbach','projects','SentNet'))
 
 # scan for existing file folders
 set_folders = [x for x in os.listdir(Path('Data')) if 'Set' in x]
@@ -117,10 +117,18 @@ set_folders = sorted(set_folders)
 # scan for files in the existing folder
 doc_folders = []
 for set in set_folders:
-    doc_list = [int(x.split('.docx')[0]) for x in os.listdir(
-            Path('Data', set, 'docx', 'Images'))]
+    # retrieve all file names and remove the '.docx' extension for all documents
+    #   in the folder but ignore any possible sub-directories
+    doc_list = [x.split('.docx')[0] for x in os.listdir(
+            Path('Data', set, 'docx', 'Images')) if os.path.isfile(
+                    Path('Data', set, 'docx', 'Images',x))]
+    # convert the file names to int form to enable proper sorting
+    doc_list = [int(x) for x in doc_list]
+    # sort the document list
     doc_list = sorted(doc_list)
-    doc_list = [str(x) + '.docx'for x in doc_list]
+    # add the '.docx' extenion back to every filename
+    doc_list = [str(x) + '.docx' for x in doc_list]
+    # add the filename to the final document list
     doc_folders.append(doc_list)
 
 # Main Function

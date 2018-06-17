@@ -9,7 +9,7 @@ Created on Sun Jun 10 16:29:34 2018
     - This script will ingest individual .docx files and .txt files and store
         them in a dataframe that matches the original format of the training
         data (i.e. training_set_rel3.csv in the \Data\ folder).
-    - DataFrame variables dependo on the type of data being ingested but will
+    - DataFrame variables depend on the type of data being ingested but will
         include, at a minimum:
             * essay_id: A unique identifier for each individual student essay
             * essay_set: the set which the essay belongs to (1-8)

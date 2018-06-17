@@ -36,7 +36,7 @@ TBD
 
 # System Resources:
 
-Setnet was developed on a system with the following resources. When attempting to run SentNet it is recomended that you have a system with similar specifications:
+SetNet was developed on a system with the following resources. When attempting to run SentNet it is recommended that you have a system with similar specifications:
 
 * Operating System: Windows 10
 * Processor: Intel Core i7-7700 - 3.6 Ghz
@@ -45,7 +45,7 @@ Setnet was developed on a system with the following resources. When attempting t
 
 # Python Packages
 
-The following packages are required to run SentNet's in python:
+The following packages are required to run SentNet's in Python:
 
 * argparse
 * docx
