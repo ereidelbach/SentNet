@@ -7,10 +7,12 @@ Created on Mon May 28 17:54:21 2018
 
 :DESCRIPTION:
     - The purpose of this script is to generate Interpretability and 
-        Readability scores for text documents based on the following three indices:
-            1. Flesch-Kincaid
+        Readability scores for text documents based on the following five indices:
+            1. Dale-Chall
+            2. Flesch
+            3. Flesch-Kincaid
             2. Gunning Fog
-            3. Cloeman-Liau  
+            3. Smog  
             
 :REQUIRES:
     - Textatistic Python Package
@@ -41,7 +43,8 @@ import textacy
 #==============================================================================
 # Function Definitions / Reference Variable Declaration
 #==============================================================================
-'''
+def textatistic_scores(document):
+    '''
     Description:
         Function that calculates scores for all relevant readability metrics
         utilizing the TEXTATISTIC Python package.  
@@ -56,8 +59,7 @@ import textacy
         document_dict (dictionary): dictionary containing the resulting scores
             for the document along with counts for total number of words, 
             syllables, and sentences
-'''
-def textatistic_scores(document):
+    '''
     document_dict = {}
     try:
         s = Textatistic(document)
@@ -81,7 +83,8 @@ def textatistic_scores(document):
         document_dict['score_smog'] = 'N/A'      
     return document_dict
 
-'''
+def textstat_scores(document):
+    '''
     Description:
         Function that calculates scores for all relevant readability metrics
         utilizing the TEXTSTAT Python package.  
@@ -96,8 +99,7 @@ def textatistic_scores(document):
         document_dict (dictionary): dictionary containing the resulting scores
             for the document along with counts for total number of words, 
             syllables, and sentences
-'''    
-def textstat_scores(document):
+    '''      
     document_dict = {}
     document_dict['count_sent'] = textstat.sentence_count(document)
     document_dict['count_sybl'] = textstat.syllable_count(document)
@@ -117,7 +119,8 @@ def textstat_scores(document):
         document_dict['score_smog'] = 'N/A'    
     return document_dict
 
-'''
+def textacy_scores(document):
+    '''
     Description:
         Function that calculates scores for all relevant readability metrics
         utilizing the TEXTACY Python package.  
@@ -135,8 +138,7 @@ def textstat_scores(document):
         document_dict (dictionary): dictionary containing the resulting scores
             for the document along with counts for total number of words, 
             syllables, and sentences
-'''
-def textacy_scores(document):
+    '''
     document = document_list[0]
     document = document.encode('ascii', 'namereplace').decode('utf-8')
     doc = textacy.Doc(document)
