@@ -18,15 +18,15 @@ doc_readability_features - Readability statistics for each document drawn from
                             academic research
 word_matrix_features - Word counts for the most common/important words within 
                         each document
-synset_matrix_features - The prevelence of the most common/important synsets
+synset_matrix_features - The prevalence of the most common/important synsets
                           (a WordNet lexigraphic representation of words) 
                           contained within each document
-edges_matrix_features - Counts of the most common/important co-occuring terms 
+edges_matrix_features - Counts of the most common/important co-occurring terms 
                          within each document
 word_centrality_matrix - The centrality/importance of key terms within each 
                           document (based on a graphical translation of that 
                           document)
-edges_matrix_features_synset - Counts of the most common/important co-occuring
+edges_matrix_features_synset - Counts of the most common/important co-occurring
                                 synsets within each document
 synset_centrality_matrix - The centrality/importance of key synsets within each 
                             document (based on a graphical translation of 
@@ -286,7 +286,7 @@ def Word_Features(data, target, limit):
     count_vec = sklearn.feature_extraction.text.CountVectorizer(vocabulary=unique_words,lowercase=False)
     count_matrix = count_vec.fit_transform(data['essay_clean'])
     
-    # Convert the sparse SciPy matrix into a dense matrix and convert intoa a pandas dataframe for further analysis
+    # Convert the sparse SciPy matrix into a dense matrix and convert into a pandas dataframe for further analysis
     count_matrix = pd.DataFrame(count_matrix.todense(),columns=unique_words)
     term_frequency_counts = pd.DataFrame(count_matrix.apply(lambda column: sum(column)),columns=['Counts'])
     
@@ -483,7 +483,7 @@ extract three additional feature sets:
     found across all essays. After identifying these clusters we calculate the 
     concentration/presence of each cluster within each document.
         
-These two sets of features will be used as the fourth, fifth, and sixth inputs 
+These two sets of features will be used as the fourth and fifth inputs 
     into our classification models.
 '''
 
