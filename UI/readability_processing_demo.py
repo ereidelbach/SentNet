@@ -131,52 +131,51 @@ for set in set_folders:
     # add the filename to the final document list
     doc_folders.append(doc_list)
 
-# Main Function
-if __name__ == "__main__":
-    ############################ GUI CONFIG
-    # create the program
-    window = tk.Tk()
-    window.geometry('800x400')
-    window.title("Welcome to SentNet: An RSEATS Analysis Tool")
-    
-    ############################ DOCUMENT SELECTION
-    # create a label
-    lbl = tk.Label(window, text="Analyze Document",
-                   font=("Verdana", 16), wraplength=600)
-    # must specify a grid for the label to show up
-    lbl.grid(column = 0, row = 0)
-    
-    # create the choose file button
-    btn = tk.Button(window, text="Choose File", bg="gray", fg="black", command=clicked)
-    btn.grid(column=0, row=1)
-    
-    # create a label to test our `choose file` button
-    lbl2 = tk.Label(window, text="No file selected",
-                   font=("Verdana", 16), wraplength=600, relief="groove")
-    lbl2.grid(column = 1, row = 1)
-    
-    # create a scorecard dropdown widget (combobox)
-    combo = tk.ttk.Combobox(window, values=set_folders)
-    combo.current(0)
-    combo.grid(row=2)
-    
-    # create a large submit button
-    btn = tk.Button(window, text = "Submit", bg="blue", fg="white", command=clicked_analyze)
-    btn.grid(row=3)
-    
-    ############################ SCORECARD SELECTION
-    # create a label
-    lbl = tk.Label(window, text="Create New Analytic Score Card (Admin Users)",
-                   font=("Verdana", 16), wraplength=600)
-    # must specify a grid for the label to show up
-    lbl.grid(column = 0, row = 4)
-    
-    # create a button that will create `Create a New RSEATS scorecard`
-    btn = tk.Button(window, text = "Submit", bg="blue", fg="white", command=clicked_scorecard)
-    btn.grid(row=5)
-    
-    # Run the program
-    window.mainloop()
-    
-    # On exit, destroy the program
-    window.destroy()
+
+############################ GUI CONFIG
+# create the program
+window = tk.Tk()
+window.geometry('800x400')
+window.title("Welcome to SentNet: An RSEATS Analysis Tool")
+
+############################ DOCUMENT SELECTION
+# create a label
+lbl = tk.Label(window, text="Analyze Document",
+               font=("Verdana", 16), wraplength=600)
+# must specify a grid for the label to show up
+lbl.grid(column = 0, row = 0)
+
+# create the choose file button
+btn = tk.Button(window, text="Choose File", bg="gray", fg="black", command=clicked)
+btn.grid(column=0, row=1)
+
+# create a label to test our `choose file` button
+lbl2 = tk.Label(window, text="No file selected",
+               font=("Verdana", 16), wraplength=600, relief="groove")
+lbl2.grid(column = 1, row = 1)
+
+# create a scorecard dropdown widget (combobox)
+combo = tk.ttk.Combobox(window, values=set_folders)
+combo.current(0)
+combo.grid(row=2)
+
+# create a large submit button
+btn = tk.Button(window, text = "Submit", bg="blue", fg="white", command=clicked_analyze)
+btn.grid(row=3)
+
+############################ SCORECARD SELECTION
+# create a label
+lbl = tk.Label(window, text="Create New Analytic Score Card (Admin Users)",
+               font=("Verdana", 16), wraplength=600)
+# must specify a grid for the label to show up
+lbl.grid(column = 0, row = 4)
+
+# create a button that will create `Create a New RSEATS scorecard`
+btn = tk.Button(window, text = "Submit", bg="blue", fg="white", command=clicked_scorecard)
+btn.grid(row=5)
+
+# Run the program
+window.mainloop()
+
+# On exit, destroy the program
+window.destroy()
