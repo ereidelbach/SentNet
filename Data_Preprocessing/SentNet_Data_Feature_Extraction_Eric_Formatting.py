@@ -458,28 +458,28 @@ document. All terms that occur within the same sentence are considered to be
 document's network. Translating document into a network based form allows us to 
 extract three additional feature sets:
 
-1) Edge Counts - First we calculate the occurance of every pair of co-occuring 
+1) Edge Counts - First we calculate the occurrence of every pair of co-occurring 
     words (within the same sentence) across all documents. Next we exclude those 
-    co-occuring words that are rare and not common enough to be a reliable 
+    co-occurring words that are rare and not common enough to be a reliable 
     feature to model on (this limiting parameter can be tuned by the user).
-    Finally, we look across all document to calculate the presence/abcesce of 
-    selected co-occuring terms. This final represention is stored as a Pandas 
+    Finally, we look across all document to calculate the presence/absence of 
+    selected co-occurring terms. This final representation is stored as a Pandas 
     dataframe allowing these features to be easily used for modeling.
 
-2) Term Betweeness Centrality - For every document we will be able to extract 
+2) Term Betweenness Centrality - For every document we will be able to extract 
     the "centrality" or importance of every term within that document. This is 
     done by first identifying the shortest path between all terms in the network.
     Next we calculate the proportion of shortest paths that traverse each term 
-    (node). This proportion (bounded between 0 and 1) is refered to as the 
-    "betweeness centrality" of that synset. This calculation is performed for 
+    (node). This proportion (bounded between 0 and 1) is referred to as the 
+    "betweenness centrality" of that synset. This calculation is performed for 
     every word in every document to ascertain that term's importance within that 
     document.
                             
 3) Document Clusters - After translating all documents into their network 
-    representation, we aggreate all networks from all documents into a 
+    representation, we aggregate all networks from all documents into a 
     single network that represents the entire corpus. From this network, we run 
-    the Louvain clsutering algorithim to identify "clusters" of words within 
-    all documents. The clusters that emerge represent common topics/arguements 
+    the Louvain clustering algorithm to identify "clusters" of words within 
+    all documents. The clusters that emerge represent common topics/arguments 
     found across all essays. After identifying these clusters we calculate the 
     concentration/presence of each cluster within each document.
         
@@ -524,7 +524,7 @@ def pd_edge_extractor(text):
 
 def touple_edge_extractor(text):
     '''
-    Purpose: This function builds an edge/connections list for the documnet 
+    Purpose: This function builds an edge/connections list for the document 
         provided. Using this edge list a document graph can be created and term 
         centrality/cluster features can be inferred. This is done through the 
         following steps:
@@ -704,30 +704,30 @@ document. Synsets that occur within the same sentence share an edge within
 the network. Translating document into a network based form allows us to 
 extract two additional feature sets:
     
-    1) Synset Edge Counts - First we calculate the occurance of every pair of 
-        co-occuring synsets (within the same sentence) across all documents.
-        Next we exclude those co-occuring sysents that are rare and not 
+    1) Synset Edge Counts - First we calculate the occurrence of every pair of 
+        co-occurring synsets (within the same sentence) across all documents.
+        Next we exclude those co-occurring synsets that are rare and not 
         common enough to be a reliable feature to model on (this limiting 
         parameter can be tuned by the user). Finally, we look across all 
-        document to calculate the presence/abcesce of selected co-occuring 
-        synsets. This final represention is stored as a Pandas dataframe 
+        document to calculate the presence/absence of selected co-occurring 
+        synsets. This final representation is stored as a Pandas dataframe 
         allowing these features to be easily used for modeling.
     
-    2) Synset Betweeness Centrality - For every document we will be able to 
+    2) Synset Betweenness Centrality - For every document we will be able to 
         extract the "centrality" or importance of every synset within that 
         document. This is done by first identifying the shortest path between 
         all synset in the network. Next we calculate the proportion of shortest 
         paths that traverse each synset. This proportion (bounded between 
-        0 and 1) is refered to as the "betweeness centrality" of that synset.
+        0 and 1) is referred to as the "betweenness centrality" of that synset.
         This calculation is performed for every synset in every document 
         to ascertain that synset's importance within that document.
                                 
     3) Synset Document Clusters - After translating all documents into their 
-        synset network representation, we aggreate all networks from all 
+        synset network representation, we aggregate all networks from all 
         documents into a single network that represents the entire corpus. From 
-        this network, we run the Louvain clsutering algorithim to identify 
+        this network, we run the Louvain clustering algorithm to identify 
         "clusters" of synsets within all documents. The clusters that emerge 
-        represent common topics/arguements found across all essays. After 
+        represent common topics/arguments found across all essays. After 
         identifying these clusters, we calculate the concentration/presence 
         of each cluster within each document.
         
