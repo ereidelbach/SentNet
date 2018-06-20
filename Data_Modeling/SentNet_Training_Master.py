@@ -48,7 +48,7 @@ test.reset_index(drop=True, inplace=True)
 
 # Define the minimum threshold (the number of documents a feature must appear in) for a feature to be included in our analysis
 limit = round(0.02*len(train))
-target = 'rater1_domain1'
+target = 'domain1_score'
 doc = 'essay'
 
 # Calculate readability features for each document
@@ -106,25 +106,28 @@ train_data = pd.concat([readability_features,
                         synset_features,
                         synset_edge_features,
                         synset_centrality_matrix,
-                        synset_cluster_features]
+                        synset_cluster_features
+                        ]
                         ,axis=1)
 
 train_data = train_data.replace('N/A',0)
 train_data = train_data.replace(np.nan,0)
+train_data = train_data.loc[:,~train_data.columns.duplicated()]
 
 # Train inital random forest for feature selection
-rfc = RandomForestClassifier(n_estimators=1000, n_jobs=7)
+rfc = RandomForestClassifier(n_estimators=10000, n_jobs=7)
 rfc.fit(train_data,train[target])
 
 # estimate the feature importance
 feature_importance = pd.DataFrame(rfc.feature_importances_,columns=['importance'])
 feature_importance = pd.concat([pd.DataFrame(list(train_data.columns)),feature_importance],axis=1)
-selected_features = list(feature_importance[feature_importance['importance']>=0.001][0])
-modeling_features = selected_features
+modeling_features = list(feature_importance[feature_importance['importance']>=0.0001][0])
 
 # train scoring model
-rfc = RandomForestClassifier(n_estimators=1000, n_jobs=7)
+rfc = RandomForestClassifier(n_estimators=2000, n_jobs=7, max_depth=8, min_samples_leaf=3)
 rfc.fit(train_data[modeling_features],train[target])
+feature_importance2 = pd.DataFrame(rfc.feature_importances_,columns=['importance'])
+feature_importance2 = pd.concat([pd.DataFrame(list(train_data[modeling_features].columns)),feature_importance2],axis=1)
 
 # calculate predicted values for training set
 preds = rfc.predict(train_data[modeling_features])
@@ -138,24 +141,88 @@ print(" ")
 ###############################################################################################
 
 # Calculate readability features for each document
-readability_features = Readability_Features(test, doc)
-
+readability_features_score = Readability_Features(test, doc)
 
 # Matching (most similar) document score (Doc2Vec)
-
+matching_docs_score = Document_Matching_Testing(test, doc, target, scores_join, gensim_model_matching, limit=0)
 
 # General Similarity score (Doc2Vec)
-
+similar_docs_score = Document_Similarity_Testing(train, doc, target, gensim_model_similarity, limit=0)
 
 # Calculate word level features for each document
-
+word_features_score = Word_Features(test, doc, limit=0)['word_matrix_features']
+word_features_score = word_features_score[word_features_score.columns.intersection(selected_words)]
 
 # Calculate word graph features for each document
-
+word_edge_features_score = Word_Edge_Features(test, doc, limit)['edges_matrix_features']
+word_edge_features_score = word_edge_features_score[word_edge_features_score.columns.intersection(list(set(word_edge_list['edge_id'])))]
+word_centrality_features_score = Word_Centrality_Features(test, doc, selected_words)
+word_cluster_features_score = Cluster_Concentrations(test, doc, word_clusters)
 
 # Calculate synset level features for each document
-
+synset_features_score = Synset_Features(test, doc, limit=0)['synset_matrix_features']
+synset_features_score = synset_features_score[synset_features_score.columns.intersection(selected_synsets)]
 
 # Calculate synset graph features for each document
+synset_edge_features_score = Synset_Edge_Features(test, doc, limit)['edges_matrix_features_synset']
+synset_edge_features_score = synset_edge_features_score[synset_edge_features_score.columns.intersection(list(set(synset_edge_list['edge_id'])))]
+synset_centrality_features_score = Synset_Centrality_Features(test, doc, selected_synsets)
+synset_cluster_features_score = Synset_Concentrations(test, doc, synset_clusters)
 
+# Preparing dataset for predictions
+test_data = pd.concat([readability_features_score, 
+                        matching_docs_score['Matching_Pred_Class'], 
+                        similar_docs_score['Sim_Pred_Class'],
+                        word_features_score,
+                        word_edge_features_score,
+                        word_centrality_features_score,
+                        word_cluster_features_score,
+                        synset_features_score,
+                        synset_edge_features_score,
+                        synset_centrality_features_score,
+                        synset_cluster_features_score
+                        ]
+                        ,axis=1)
 
+test_data = test_data.replace('N/A',0)
+test_data = test_data.replace(np.nan,0)
+test_data = test_data.loc[:,~test_data.columns.duplicated()]
+
+train_test_diff = list(set(modeling_features)-set(test_data.columns))
+
+for i in train_test_diff:
+    test_data[i]=0
+
+# test scoring model
+preds = rfc.predict(test_data[modeling_features])
+pred_crosstab = pd.crosstab(test[target],preds)
+print("TESTING")
+print(pred_crosstab)
+print(" ")
+
+accurate_count = 0
+for i in range(0,len(pred_crosstab-1)):
+    try:
+        accurate_count += pred_crosstab.iloc[i,i]
+    except:
+        pass
+
+total_count = pred_crosstab.sum().sum()
+accuracy_rate = accurate_count/total_count
+print("Total Accuracy Rate: "+str(accuracy_rate))
+
+accuracy = pd.concat([pd.DataFrame(test[target]), pd.DataFrame(preds)],axis=1)
+accuracy['correct_pred'] = accuracy.apply(lambda row: math.sqrt((row[target]-row[0])**2), axis=1)
+accuracy['correct_buffer'] = accuracy['correct_pred']<=1
+model_error = accuracy['correct_pred'].mean()
+print("Model Error: "+str(model_error))
+
+adjusted_accuracy = (accuracy['correct_buffer']==1).sum()/len(test)
+print("Adjusted Accuracy: "+str(adjusted_accuracy))
+
+model_results = {'model_error':model_error,
+                 'accuracy_rate':accuracy_rate,
+                 'adjusted_accuracy':adjusted_accuracy,
+                 'pred_crosstab':pred_crosstab,
+                 'feature_importance':feature_importance
+                 }
