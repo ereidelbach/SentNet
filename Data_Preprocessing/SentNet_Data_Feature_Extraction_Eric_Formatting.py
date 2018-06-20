@@ -14,24 +14,38 @@ In this file we define all the feature extraction function that are used within
 SentNet. Using the functions contained within this file, a corpus can be 
 transformed into the following feature sets:
 
-doc_readability_features - Readability statistics for each document drawn from 
-                            academic research
-word_matrix_features - Word counts for the most common/important words within 
-                        each document
-synset_matrix_features - The prevalence of the most common/important synsets
-                          (a WordNet lexigraphic representation of words) 
-                          contained within each document
-edges_matrix_features - Counts of the most common/important co-occurring terms 
-                         within each document
-word_centrality_matrix - The centrality/importance of key terms within each 
-                          document (based on a graphical translation of that 
-                          document)
-edges_matrix_features_synset - Counts of the most common/important co-occurring
-                                synsets within each document
-synset_centrality_matrix - The centrality/importance of key synsets within each 
-                            document (based on a graphical translation of 
-                            that document)
+### READABILITY
+1. doc_readability_features:  Readability statistics for each document drawn 
+                                from academic research
+                                
+### WORD-LEVEL FEATURES
+2. word_matrix_features:  Word counts for the most common/important words 
+                            within each document
 
+### WORD GRAPH FEATURES
+3. edges_matrix_features:  Counts of the most common/important co-occurring
+                             terms within each document
+4. word_centrality_matrix:  The centrality/importance of key terms within each 
+                              document (based on a graphical translation of 
+                              that document)
+5. word_cluster_features:  Clusters that represent common topics/arguments, 
+                                found across all essays, and their 
+                                concenctration/presence within each document 
+                            
+### SYNSET-LEVEL FEATURES
+6. synset_matrix_features:  The prevalence of the most common/important synsets
+                              (a WordNet lexigraphic representation of words) 
+                              contained within each document
+
+### SYNSET GRAPH FEATUERS
+7. edges_matrix_features_synset:  Counts of the most common/important 
+                                    co-occurring synsets within each document
+8. synset_centrality_matrix:  The centrality/importance of key synsets within 
+                                each document (based on a graphical translation 
+                                of that document)
+9. synset_cluster_features:  Clusters that represent common topics/arguments, 
+                                found across all essays, and their 
+                                concenctration/presence within each document
 '''   
 
 ###############################################################################
@@ -89,31 +103,6 @@ punctuations_2 = '''!()-[]{};.:'"\,<>/?@#$%^&*_~'''
 # Defining the sentence tokenization method to be used later on
 sent_tokenize = nltk.tokenize.punkt.PunktSentenceTokenizer()
 
-###############################################################################
-# Data Ingest
-###############################################################################
-
-################################## .Docx Data Ingest ##########################
-'''
-# Specify a folder that contains the training document in .docx format
-doc_folder_path = "C:\\Users\\GTayl\\Desktop\\Visionist\\SentNet\\Data\\Example_Docs"
-img_dir = "C:\\Users\\GTayl\\Desktop\\Visionist\\SentNet\\Photos\\test_photos"
-
-# Use the Ingest Training Data function from SentNet_Data_Prep_Functions.py 
-#   to read in the training data 
-data = Ingest_Training_Data(doc_folder_path, img_dir)
-
-############################### Spreadsheet Data Ingest #######################
-# Alternatively read in data from a prepoulated spreadsheet (or database table)
-traing_data = 'C:\\Users\\GTayl\\Desktop\\Visionist\\SentNet\\Data\\training_set_rel3.tsv'
-data = pd.DataFrame.from_csv(traing_data, sep='\t', header=0, encoding='ISO-8859-1')
-
-# Select any subset (Scorecard) that you want to use for training
-data = data[data['essay_set']==1]
-print("Done Data Injest")
-time1 = time.time()
-print(time1-start)
-'''
 ###############################################################################
 # Data Cleaning 
 ###############################################################################
@@ -184,8 +173,8 @@ def clean_sentence(text):
 ###############################################################################
 '''
 In this section, we define the function used to run and extract various 
-"readability" metrics for every document. These features will be the first 
-input into our classification models.
+"readability" metrics for every document. These features will serve as inputs 
+into our classification models.
 '''
 
 # Create a copy of our original data pull to append to
@@ -235,8 +224,8 @@ def Readability_Features(data, target):
 ###############################################################################
 '''
 In this section, we define the function to identify and extract all word/token 
-based features from every document. These features will be the second input 
-into our classification models.
+based features from every document. These features will serve as inputs into
+our classification models.
 '''
 
 def Word_Features(data, target, limit):
@@ -304,8 +293,8 @@ def Word_Features(data, target, limit):
 ###############################################################################
 '''
 In the below section, we define the functions to identify and extract all 
-sysnset based features from every document. These features will be the third 
-input into our classification models.
+sysnset based features from every document. These features will serve as inputs
+into our classification models.
 '''
 
 ########################## Synset Translation Functions #######################
@@ -483,8 +472,7 @@ extract three additional feature sets:
     found across all essays. After identifying these clusters we calculate the 
     concentration/presence of each cluster within each document.
         
-These two sets of features will be used as the fourth and fifth inputs 
-    into our classification models.
+These three sets of features will be used inputs into our classification models.
 '''
 
 ######################### Word - Edge Feature Generation Functions ############
@@ -731,8 +719,8 @@ extract two additional feature sets:
         identifying these clusters, we calculate the concentration/presence 
         of each cluster within each document.
         
-These two sets of features will then be used as the sixth and seventh inputs 
-into our classification models.
+These three sets of features will then be used as inputs into our 
+classification models.
 '''
    
 ######################### Synset - Edge Feature Generation Functions ##########

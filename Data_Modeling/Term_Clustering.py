@@ -10,7 +10,8 @@ Created on Sat Jun  9 01:09:24 2018
 # =============================================================================
 
 '''
-In this document we define all the functions that are required to perform document clustering using both words and synsets
+In this document we define all the functions that are required to perform 
+document clustering using both words and synsets
 '''
 
 # =============================================================================
@@ -36,18 +37,32 @@ def Clustering_Features(edge_table, limit, remove_duplicates=False):
     Purpose: This function is used to develop topic clusters using words.
              It accomplishes this through the following steps:
                  
-                 1) Using an existing edge table (with Item_A, Item_B, and an edge_ID) this function first counts the number of times each edge/connection occurs within our training corpus
-                 2) We then subset this list to only focus on co-occurring items that occur more than the user provided limit
-                 3) Next we feed the co-occuring terms that exceed this threshold into a NetworkX graph, creating a new "edge" or connection within the graph for every set of co-occuring items in our table
-                 4) After this we use the Louvain algorithim to partition the word graph into clusters and assign each term within the graph to one of these clusters
+                 1) Using an existing edge table (with Item_A, Item_B, and an 
+                        edge_ID) this function first counts the number of times 
+                        each edge/connection occurs within our training corpus
+                 2) We then subset this list to only focus on co-occurring 
+                        items that occur more than the user provided limit
+                 3) Next we feed the co-occuring terms that exceed this 
+                        threshold into a NetworkX graph, creating a new "edge" 
+                        or connection within the graph for every set of 
+                        co-occuring items in our table
+                 4) After this we use the Louvain algorithim to partition the 
+                        word graph into clusters and assign each term within 
+                        the graph to one of these clusters
         
     Input: This function requires the following inputs:
             
-            1) edge_table = an edge table provided by the word_edge_features function
-            2) limit = The minimum number of times a group of co-occuring items need to be observed together in order to be included in our clusters
-            3) remove_duplicates = Set to "False" by default, if set to "True" an edge will only be added to the graph once which can change the clusters produced
+            1) edge_table: An edge table provided by the word_edge_features 
+                    function
+            2) limit: The minimum number of times a group of co-occuring 
+                    items need to be observed together in order to be included 
+                    in our clusters
+            3) remove_duplicates: Set to "False" by default. 
+                    If set to "True," an edge will only be added to the graph 
+                    once which can change the clusters produced
         
-    Output: This function returns a pandas DataFrame that maps terms within the graph to thier coresponding topic cluster
+    Output: This function returns a pandas DataFrame that maps terms within the
+                graph to their corresponding topic cluster
     '''
     
     # Edges Group By Edge to Subset
@@ -85,14 +100,16 @@ def Clustering_Features(edge_table, limit, remove_duplicates=False):
 
 def cluster_concentration(string, cluster_term_list):
     '''
-    Purpose: This function returns the percentage of terms from a given topic that are contained within the provided document
+    Purpose: This function returns the percentage of terms from a given topic 
+                that are contained within the provided document
         
     Input: This function takes two inputs:
         
-            1) string = the original document text
-            2) cluster_term_list = a list of terms that comprise the given topic
+            1) string: the original document text
+            2) cluster_term_list: a list of terms that comprise the given topic
         
-    Output: a float between 0 and 1 that represent how many terms from the given topic are contained within the document
+    Output: a float between 0 and 1 that represent how many terms from the 
+                given topic are contained within the document
     '''
     
     doc_words = clean_words(string)
@@ -105,15 +122,22 @@ def cluster_concentration(string, cluster_term_list):
 
 def Cluster_Concentrations(data, doc, partition_list):
     '''
-    Purpose: This function used the cluster_concentration to obtain the "concentration" or "representation" of all word based clusters within a given document
+    Purpose: This function used the cluster_concentration to obtain the 
+                "concentration" or "representation" of all word based clusters 
+                within a given document
         
     Input: This function requires three inputs:
         
-            1) data = a pandas Dataframe that contains the documents you would like the score
-            2) doc = a string that references the specific column/feature within that document that contains the original document text
-            3) partition_list = a pandas DataFrame that maps terms to clusters within the entire corpus (provided by the Clustering_Features function)
+            1) data: pandas Dataframe that contains the documents you would 
+                    like the score
+            2) doc: string that references the specific column/feature within 
+                    that document that contains the original document text
+            3) partition_list: pandas DataFrame that maps terms to clusters 
+                    within the entire corpus (provided by the 
+                    Clustering_Features function)
         
-    Output: a pandas DataFrame that contains a measure of cluster concentration, for every cluster, in every document
+    Output: a pandas DataFrame that contains a measure of cluster 
+            concentration, for every cluster, in every document
     '''
     
     # For loop to extract cluster concentrations in each document
@@ -129,7 +153,9 @@ def Cluster_Concentrations(data, doc, partition_list):
         cluster_term_list = list(cluster_term_list.index)
         cluster_name = "Word_Cluster_"+str(c)
         
-        cluster_features[cluster_name] = data.apply(lambda row: cluster_concentration(row[doc], cluster_term_list), axis=1)
+        cluster_features[cluster_name] = data.apply(
+                lambda row: cluster_concentration(
+                        row[doc], cluster_term_list), axis=1)
     
     return(cluster_features)
 
@@ -143,18 +169,33 @@ def Synset_Clustering_Features(edge_table, limit, remove_duplicates=False):
     Purpose: This function is used to develop topic clusters using synsets.
              It accomplishes this through the following steps:
                  
-                 1) Using an existing edge table (with Synset_A, Synset_B, and an edge_ID) this function first counts the number of times each edge/connection occurs within our training corpus
-                 2) We then subset this list to only focus on co-occurring items that occur more than the user provided limit
-                 3) Next we feed the co-occuring terms that exceed this threshold into a NetworkX graph, creating a new "edge" or connection within the graph for every set of co-occuring items in our table
-                 4) After this we use the Louvain algorithim to partition the work/synset graph into clusters and assign each synset within the graph to one of these clusters
+                 1) Using an existing edge table (with Synset_A, Synset_B, 
+                      and an edge_ID) this function first counts the number of 
+                      times each edge/connection occurs within our training 
+                      corpus
+                 2) We then subset this list to only focus on co-occurring 
+                      items that occur more than the user provided limit
+                 3) Next we feed the co-occuring terms that exceed this 
+                      threshold into a NetworkX graph, creating a new "edge" or 
+                      connection within the graph for every set of co-occuring 
+                      items in our table
+                 4) After this we use the Louvain algorithim to partition the 
+                      work/synset graph into clusters and assign each synset 
+                      within the graph to one of these clusters
         
     Input: This function requires the following inputs:
             
-            1) edge_table = an edge table provided by the synset_edge_features function
-            2) limit = The minimum number of times a group of co-occuring items need to be observed together in order to be included in our clusters
-            3) remove_duplicates = Set to "False" by default, if set to "True" an edge will only be added to the graph once which can change the clusters produced
+            1) edge_table: an edge table provided by the synset_edge_features 
+                             function
+            2) limit: The minimum number of times a group of co-occuring items 
+                        need to be observed together in order to be included 
+                        in our clusters
+            3) remove_duplicates: Set to "False" by default, if set to "True" 
+                        an edge will only be added to the graph once which 
+                        can change the clusters produced
         
-    Output: This function returns a pandas DataFrame that maps synsets within the graph to thier coresponding topic cluster
+    Output: This function returns a pandas DataFrame that maps synsets within 
+            the graph to thier coresponding topic cluster
     '''
     
     # Edges Group By Edge to Subset
@@ -192,14 +233,16 @@ def Synset_Clustering_Features(edge_table, limit, remove_duplicates=False):
 
 def synset_cluster_concentration(string, cluster_synset_list):
     '''
-    Purpose: This function returns the percentage of synsets from a given topic that are contained within the provided document
+    Purpose: This function returns the percentage of synsets from a given topic 
+                that are contained within the provided document
         
     Input: This function takes two inputs:
         
-            1) string = the original document text
-            2) cluster_term_list = a list of synsets that comprise the given topic
+            1) string: the original document text
+            2) cluster_term_list: a list of synsets that comprise the given topic
         
-    Output: a float between 0 and 1 that represent how many synsets from the given topic are contained within the document
+    Output: a float between 0 and 1 that represent how many synsets from the 
+                given topic are contained within the document
     '''
     
     doc_synsets = synset_translated_list(string)
@@ -211,15 +254,22 @@ def synset_cluster_concentration(string, cluster_synset_list):
 
 def Synset_Concentrations(data, doc, partition_list):
     '''
-    Purpose: This function used the cluster_concentration to obtain the "concentration" or "representation" of all synset based clusters within a given document
+    Purpose: This function used the cluster_concentration to obtain the 
+                "concentration" or "representation" of all synset based 
+                clusters within a given document
         
     Input: This function requires three inputs:
         
-            1) data = a pandas Dataframe that contains the documents you would like the score
-            2) doc = a string that references the specific column/feature within that document that contains the original document text
-            3) partition_list = a pandas DataFrame that maps synsets to clusters within the entire corpus (provided by the Synset_Clustering_Features function)
+            1) data: pandas Dataframe that contains the documents you would 
+                        like the score
+            2) doc: string that references the specific column/feature within 
+                        that document that contains the original document text
+            3) partition_list: pandas DataFrame that maps synsets to clusters 
+                    within the entire corpus (provided by the 
+                    Synset_Clustering_Features function)
         
-    Output: a pandas DataFrame that contains a measure of cluster concentration, for every cluster, in every document
+    Output: a pandas DataFrame that contains a measure of cluster concentration, 
+            for every cluster, in every document
     '''
     
     # For loop to extract cluster concentrations in each document
@@ -235,6 +285,8 @@ def Synset_Concentrations(data, doc, partition_list):
         cluster_synset_list = list(cluster_synset_list.index)
         cluster_name = "Synset_Cluster_"+str(c)
         
-        cluster_features[cluster_name] = data.apply(lambda row: synset_cluster_concentration(row[doc], cluster_synset_list), axis=1)
+        cluster_features[cluster_name] = data.apply(
+                lambda row: synset_cluster_concentration(
+                        row[doc], cluster_synset_list), axis=1)
     
     return(cluster_features)
