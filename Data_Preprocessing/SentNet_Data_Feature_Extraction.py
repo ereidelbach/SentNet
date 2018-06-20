@@ -39,8 +39,8 @@ import sklearn
 import networkx as nx
 
 # Import required image hashing packages
-from SentNet_Data_Prep_Functions import Ingest_Training_Data
-from Goldberg_Perceptual_Hashing import ImageSignature
+from Data_Ingest.SentNet_Data_Prep_Functions import Ingest_Training_Data
+from Data_Preprocessing.Goldberg_Perceptual_Hashing import ImageSignature
 gis = ImageSignature()
 
 # Importing NLTK related packages and content
@@ -67,7 +67,7 @@ except:
             """)
 
 # Import text analytics functions from readability_score_generation_packages.py
-from readability_score_generation_packages import textatistic_scores, textstat_scores
+from Analytics_Readability.readability_score_generation_packages import textatistic_scores, textstat_scores
 
         
 # Define the list of punctuation to be removed

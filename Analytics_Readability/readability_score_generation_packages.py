@@ -34,11 +34,11 @@ Created on Mon May 28 17:54:21 2018
 #==============================================================================
 import os
 import pandas as pd
-import spacy
-spacy.load('en')
+#import spacy
+#spacy.load('en')
 from textstat.textstat import textstat
 from textatistic import Textatistic
-import textacy
+#import textacy
 
 #==============================================================================
 # Function Definitions / Reference Variable Declaration
@@ -119,83 +119,82 @@ def textstat_scores(document):
         document_dict['score_smog'] = 'N/A'    
     return document_dict
 
-def textacy_scores(document):
-    '''
-    Description:
-        Function that calculates scores for all relevant readability metrics
-        utilizing the TEXTACY Python package.  
-    
-        Details on the package can be found here:
-            - https://chartbeat-labs.github.io/textacy/index.html
-            
-        You must install the English module for this package to function:
-            - python -m spacy download en
-        
-    Input:
-        document (string): string containing the document to be scored
-        
-    Output:
-        document_dict (dictionary): dictionary containing the resulting scores
-            for the document along with counts for total number of words, 
-            syllables, and sentences
-    '''
-    document = document_list[0]
-    document = document.encode('ascii', 'namereplace').decode('utf-8')
-    doc = textacy.Doc(document)
-    ts = textacy.TextStats(doc)
-    document_dict = {}
-    document_dict['count_sent'] = ts.n_sents
-    document_dict['count_sybl'] = ts.n_syllables
-    document_dict['count_word'] = ts.n_words
-    try:
-        document_dict['score_colemanliau'] = ts.coleman_liau_index
-        document_dict['score_dalechall'] = 'N/A'
-        document_dict['score_flesch'] = ts.flesch_reading_ease
-        document_dict['score_fleschkincaid'] = ts.flesch_kincaid_grade_level
-        document_dict['score_gunningfog'] = ts.gunning_fog_index
-        document_dict['score_smog'] = ts.smog_index
-    except(ZeroDivisionError):
-        print('TEXTACY -- Error with: ' + document)
-        document_dict['score_colemanliau'] = 'N/A'
-        document_dict['score_dalechall'] = 'N/A'
-        document_dict['score_flesch'] = 'N/A'
-        document_dict['score_fleschkincaid'] = 'N/A'
-        document_dict['score_gunningfog'] = 'N/A'
-        document_dict['score_smog'] = 'N/A'    
-    return document_dict
+#def textacy_scores(document):
+#    '''
+#    Description:
+#        Function that calculates scores for all relevant readability metrics
+#        utilizing the TEXTACY Python package.  
+#    
+#        Details on the package can be found here:
+#            - https://chartbeat-labs.github.io/textacy/index.html
+#            
+#        You must install the English module for this package to function:
+#            - python -m spacy download en
+#        
+#    Input:
+#        document (string): string containing the document to be scored
+#        
+#    Output:
+#        document_dict (dictionary): dictionary containing the resulting scores
+#            for the document along with counts for total number of words, 
+#            syllables, and sentences
+#    '''
+#    document = document.encode('ascii', 'namereplace').decode('utf-8')
+#    doc = textacy.Doc(document)
+#    ts = textacy.TextStats(doc)
+#    document_dict = {}
+#    document_dict['count_sent'] = ts.n_sents
+#    document_dict['count_sybl'] = ts.n_syllables
+#    document_dict['count_word'] = ts.n_words
+#    try:
+#        document_dict['score_colemanliau'] = ts.coleman_liau_index
+#        document_dict['score_dalechall'] = 'N/A'
+#        document_dict['score_flesch'] = ts.flesch_reading_ease
+#        document_dict['score_fleschkincaid'] = ts.flesch_kincaid_grade_level
+#        document_dict['score_gunningfog'] = ts.gunning_fog_index
+#        document_dict['score_smog'] = ts.smog_index
+#    except(ZeroDivisionError):
+#        print('TEXTACY -- Error with: ' + document)
+#        document_dict['score_colemanliau'] = 'N/A'
+#        document_dict['score_dalechall'] = 'N/A'
+#        document_dict['score_flesch'] = 'N/A'
+#        document_dict['score_fleschkincaid'] = 'N/A'
+#        document_dict['score_gunningfog'] = 'N/A'
+#        document_dict['score_smog'] = 'N/A'    
+#    return document_dict
     
 #==============================================================================
 # Working Code
 #==============================================================================
 
-# Set the project working directory
+## Set the project working directory
 #os.chdir(r'E:\Projects\SentNet\Data')
-os.chdir(r'C:\MSA\Projects\SentNet\Data')
-
-# Read in Training Data Set 7 for scoring
-df = pd.read_csv('Set7/training_set_rel3_set7.csv', encoding = "utf-8",
-                 index_col = 0)
-
-document_list = list(df['essay'])
-
-# Create a list for storing the scores of every document in this training set
-score_list = []
-
-# Compute scores with both Textatistic and Textstat
-for document in document_list:
-    document_dict = {}
-    document_dict['text'] = document
-    
-    # retrieve the scores from all popular readability packages:
-    #   textatistic, textstat, and textacy
-    document_dict['textatistic'] = textatistic_scores(document)
-    document_dict['textstat'] = textstat_scores(document)
-    document_dict['textacy'] = textacy_scores(document)
-    
-    # store the results
-    score_list.append(document_dict)
-    
-    # count our progress in the list
-    if document_list.index(document) % 100 == 0:
-        print(document_list.index(document))
+##os.chdir(r'C:\MSA\Projects\SentNet\Data')
+#
+## Read in Training Data Set 7 for scoring
+#df = pd.read_csv('Set7/training_set_rel3_set7.csv', encoding = "utf-8",
+#                 index_col = 0)
+#
+#document_list = list(df['essay'])
+#
+## Create a list for storing the scores of every document in this training set
+#score_list = []
+#
+## Compute scores with both Textatistic and Textstat
+#for document in document_list:
+#    document_dict = {}
+#    document_dict['text'] = document
+#    
+#    # retrieve the scores from all popular readability packages:
+#    #   textatistic, textstat, and textacy
+#    document_dict['textatistic'] = textatistic_scores(document)
+#    document_dict['textstat'] = textstat_scores(document)
+#    document_dict['textacy'] = textacy_scores(document)
+#    
+#    # store the results
+#    score_list.append(document_dict)
+#    
+#    # count our progress in the list
+#    if document_list.index(document) % 100 == 0:
+#        print(document_list.index(document))
     

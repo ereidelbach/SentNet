@@ -6,33 +6,69 @@ Created on Tue Jun 12 22:56:51 2018
 """
 
 # Read in the required packages
-
-from SentNet_Data_Feature_Extraction_V3 import Readability_Features
-from sklearn.model_selection import train_test_split
 import numpy as np
+from pathlib import Path
+import pandas as pd
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.model_selection import train_test_split
+
+# import functions from other python files
+from Data_Ingest.SentNet_Data_Prep_Functions import Ingest_Training_Data
+#from SentNet_Data_Feature_Extraction_V3 import Readability_Features
+from Data_Preprocessing.SentNet_Data_Feature_Extraction import Word_Features, \
+Word_Edge_Features, Word_Centrality_Features, Synset_Features, \
+Synset_Edge_Features, Synset_Centrality_Features
+from Data_Modeling.Term_Clustering import Clustering_Features, Cluster_Concentrations, \
+Synset_Clustering_Features, Synset_Concentrations
+from Data_Modeling.SentNet_Document_Matching import Document_Matching_Training
+from Data_Modeling.SentNet_Document_Similarity import Document_Similarity_Training
 
 ###############################################################################################
 # Data Ingest 
 ###############################################################################################
 
 ################################## .Docx Data Ingest ##########################################
-'''
-# Specify a folder that contains the training document in .docx format
-doc_folder_path = "C:\\Users\\GTayl\\Desktop\\Visionist\\SentNet\\Data\\Example_Docs"
-img_dir = "C:\\Users\\GTayl\\Desktop\\Visionist\\SentNet\\Photos\\test_photos"
 
-# Use the Ingest Training Data function from SentNet_Data_Prep_Functions.py to read in the training data 
-data = Ingest_Training_Data(doc_folder_path, img_dir)
+# This assumes the Set1 Data is in the path: SentNet\Data\Set1\docx\Images
+path_data = Path('Data','Set1','docx','Images')
+# It will place your image files in: SentNet\Data\Set1\docx\Images\Unpacked
+path_images = Path('Data','Set1','docx','Images', 'Unpacked')
+# Ingest the training data
+data_raw = Ingest_Training_Data(path_data, path_images)
+
+temp_list = []
+for index, row in data_raw.iterrows():
+    # luckily, everything is broken up by line splits so let's break up the text that way
+    doc_elements = row['Doc_Text'].split('\n')
+    # delete empty elements
+    doc_elements = [x for x in doc_elements if x != '']
+    # remove any rows that are similar to 'Image 1', 'Image 2', etc...
+    doc_elements = [x for x in doc_elements if 'Image ' not in x]
+    # create a dictionary where the key is the variable name and the value is score/text from the document
+    doc_dict = {}
+    for (key, value) in zip(doc_elements[::2], doc_elements[1::2]):
+        doc_dict[key] = value
+    # throw in the other row info into the dict
+    doc_dict['Doc_Title'] = row['Doc_Title']
+    doc_dict['Doc_Images'] = row['Doc_Images']
+    temp_list.append(doc_dict)
+   
+# turn the list of dictionaries into a new dataframe with all the the info
+#   necessary to proceed with analysis and modeling
+data = pd.DataFrame(temp_list)
+
 '''
 ############################### Spreadsheet Data Ingest #######################################
-# Alternatively read in data from a prepoulated spreadsheet (or database table)
-traing_data = 'C:\\Users\\GTayl\\Desktop\\Visionist\\SentNet\\Data\\training_set_rel3.tsv'
-data = pd.DataFrame.from_csv(traing_data, sep='\t', header=0, encoding='ISO-8859-1')
+# Alternatively read in data from a pre-populated spreadsheet (or database table)
+# This assumes we wish to read the csv located in the path: 
+#      SentNet\Data\Set1
+data_train = Path('Data','Set1','docx','Images')
+data = pd.DataFrame.from_csv(data_train, sep='\t', header=0, encoding='ISO-8859-1')
 
 # Select any subset (Scorecard) that you want to use for training
 data = data[data['essay_set']==1]
-print("Done Data Injest")
+print("Done Data Ingest")
+'''
 
 ###############################################################################################
 # Train and Test Split
