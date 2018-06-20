@@ -701,7 +701,7 @@ def Word_Centrality_Features(data, target, selected_words):
 '''
 In this section, we define the functions to create a synset network for every 
 document. Synsets that occur within the same sentence share an edge within 
-the network. Translating document into a network based form allows us to 
+the network. Translating documents into a network based form allows us to 
 extract two additional feature sets:
     
     1) Synset Edge Counts - First we calculate the occurrence of every pair of 
