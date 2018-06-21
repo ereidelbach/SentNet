@@ -13,19 +13,18 @@ Created on Mon May 28 17:54:21 2018
             3. Flesch-Kincaid
             2. Gunning Fog
             3. Smog  
+    -The purpose of readability tests are to indicate how difficult a passage 
+        of text is to understand or comprehend. Different tests have different 
+        formulas but the general idea across all tests is the same: 
+            provide a score based on characteristics such as average word 
+            length or sentence length in order to assign a reading grade 
+            level or a measurement of linguistic difficulty.  
             
 :REQUIRES:
     - Textatistic Python Package
         https://pypi.org/project/textatistic/
     - TextStat Python Package
-        https://pypi.org/project/textstat/
-    - Textacy Python Package
-        Requires the `en` library which can be installed via the command:
-            `python -m spacy download en`
-            ** Must run as administrator if on Windows
-        Textacy can be installed via the Anaconda prompt on Windows:
-            `conda install -c conda-forge textacy `
-        
+        https://pypi.org/project/textstat/       
 :TODO:
 """
  
@@ -118,18 +117,23 @@ def textstat_scores(document):
         document_dict['score_gunningfog'] = 'N/A'
         document_dict['score_smog'] = 'N/A'    
     return document_dict
-
+        
 #def textacy_scores(document):
 #    '''
 #    Description:
 #        Function that calculates scores for all relevant readability metrics
 #        utilizing the TEXTACY Python package.  
+#           Note: Textacy requires the Spacy package to be installed as well
 #    
 #        Details on the package can be found here:
 #            - https://chartbeat-labs.github.io/textacy/index.html
 #            
-#        You must install the English module for this package to function:
-#            - python -m spacy download en
+#        You must install the English module for this package to function. 
+#        It can be installed via the command:
+#            "python -m spacy download en"
+#       
+#        Textacy can be installed via the Anaconda prompt on Windows:
+#           "conda install -c conda-forge textacy"
 #        
 #    Input:
 #        document (string): string containing the document to be scored
@@ -162,39 +166,3 @@ def textstat_scores(document):
 #        document_dict['score_gunningfog'] = 'N/A'
 #        document_dict['score_smog'] = 'N/A'    
 #    return document_dict
-    
-#==============================================================================
-# Working Code
-#==============================================================================
-
-## Set the project working directory
-#os.chdir(r'E:\Projects\SentNet\Data')
-##os.chdir(r'C:\MSA\Projects\SentNet\Data')
-#
-## Read in Training Data Set 7 for scoring
-#df = pd.read_csv('Set7/training_set_rel3_set7.csv', encoding = "utf-8",
-#                 index_col = 0)
-#
-#document_list = list(df['essay'])
-#
-## Create a list for storing the scores of every document in this training set
-#score_list = []
-#
-## Compute scores with both Textatistic and Textstat
-#for document in document_list:
-#    document_dict = {}
-#    document_dict['text'] = document
-#    
-#    # retrieve the scores from all popular readability packages:
-#    #   textatistic, textstat, and textacy
-#    document_dict['textatistic'] = textatistic_scores(document)
-#    document_dict['textstat'] = textstat_scores(document)
-#    document_dict['textacy'] = textacy_scores(document)
-#    
-#    # store the results
-#    score_list.append(document_dict)
-#    
-#    # count our progress in the list
-#    if document_list.index(document) % 100 == 0:
-#        print(document_list.index(document))
-    
