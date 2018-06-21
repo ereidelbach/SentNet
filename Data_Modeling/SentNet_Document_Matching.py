@@ -48,7 +48,7 @@ def read_corpus(data, field, tokens_only=False):
     '''
     
     for index, row in data.iterrows():
-        if tokens_only:
+        if tokens_only==True:
             #yield gensim.utils.simple_preprocess(row[field])
             yield gensim.models.doc2vec.TaggedDocument(gensim.utils.simple_preprocess(row[field]))
         else:
@@ -72,7 +72,7 @@ def Doc2Vec_Training_Model(train_corpus, field):
     # Preprocess text for Doc2Vec Model
     
     # Train the Model
-    model = gensim.models.doc2vec.Doc2Vec(vector_size=200, min_count=1, epochs=500)
+    model = gensim.models.doc2vec.Doc2Vec(vector_size=200, min_count=1, epochs=1000)
     model.build_vocab(train_corpus)
     model.train(train_corpus, total_examples=model.corpus_count, epochs=model.epochs)
     
@@ -108,7 +108,7 @@ def Doc2Vec_Estimates_Training(model, train_corpus, scores_join, target, limit=0
     '''
     
     # Initialize the Dictionary to Return
-    estimates = pd.DataFrame(columns=['Doc_ID','Pred_Class','Pred_Prob'])
+    estimates = pd.DataFrame(columns=['Doc_ID','Matching_Pred_Class','Pred_Prob'])
 
     # Establish a For loop to loop over all documents
     for doc_id in range(len(train_corpus)):
@@ -131,7 +131,7 @@ def Doc2Vec_Estimates_Training(model, train_corpus, scores_join, target, limit=0
             pred_class=0
         
         # Append the estimates to the estimates dataframe
-        estimates = estimates.append({'Doc_ID':doc_id, 'Pred_Class':pred_class, 'Pred_Prob':pred_prob}, ignore_index=True)
+        estimates = estimates.append({'Doc_ID':doc_id, 'Matching_Pred_Class':pred_class, 'Pred_Prob':pred_prob}, ignore_index=True)
             
     return(estimates)
     
@@ -158,13 +158,13 @@ def Doc2Vec_Estimates_Testing(model, train_corpus, scores_join, target, limit=0)
     Output: This function returns a pandas DataFrame with the following features:
         
             1) Doc_Id = The index of provided document
-            2) Pred_Class = The predicted class/value of that document (assigned using the method described above)
+            2) Matching_Pred_Class = The predicted class/value of that document (assigned using the method described above)
             3) Pred_Prob = The Doc2Vec provided probability of a match
         
     '''
     
     # Initialize the Dictionary to Return
-    estimates = pd.DataFrame(columns=['Doc_ID','Pred_Class','Pred_Prob','Weighted_Class'])
+    estimates = pd.DataFrame(columns=['Doc_ID','Matching_Pred_Class','Pred_Prob','Weighted_Class'])
 
     # Establish a For loop to loop over all documents
     for doc_id in range(len(train_corpus)):
@@ -191,7 +191,7 @@ def Doc2Vec_Estimates_Testing(model, train_corpus, scores_join, target, limit=0)
         weighted_class = sims['Weighted_Class'].mean()
         
         # Append the estimates to the estimates dataframe
-        estimates = estimates.append({'Doc_ID':doc_id, 'Pred_Class':pred_class, 'Pred_Prob':pred_prob}, ignore_index=True)
+        estimates = estimates.append({'Doc_ID':doc_id, 'Matching_Pred_Class':pred_class, 'Pred_Prob':pred_prob}, ignore_index=True)
             
     return(estimates)
 
@@ -253,10 +253,10 @@ def Document_Matching_Testing(test, doc, target, scores_join, gensim_training, l
     '''
 
     # Develop the training corpus
-    train_corpus = list(read_corpus(train, doc, target))
+    test_corpus = list(read_corpus(test, doc, target))
     
     # Obtain Estimates
-    test_esimates = Doc2Vec_Estimates_Training(gensim_training, train_corpus, scores_join, target, limit=0)
+    test_esimates = Doc2Vec_Estimates_Training(gensim_training, test_corpus, scores_join, target, limit=0)
     
     return(test_esimates)
 
