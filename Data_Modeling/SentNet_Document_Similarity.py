@@ -100,8 +100,7 @@ def Doc2Vec_Training_Model_Sim(train_corpus):
     # Preprocess text for Doc2Vec Model
     
     # Train the Model
-    model = gensim.models.doc2vec.Doc2Vec(
-            vector_size=200, min_count=6, epochs=1000)
+    model = gensim.models.doc2vec.Doc2Vec(vector_size=200, min_count=6, epochs=1000)
     model.build_vocab(train_corpus)
     model.train(train_corpus, total_examples=model.corpus_count, epochs=model.epochs)
     
@@ -133,10 +132,10 @@ def Doc2Vec_Sim_Estimates(model, train_corpus, limit=0):
              using the Doc2Vec_Training_Model_Sim function)
         2) train_corpus = a doc2vec.TaggedDocument list (returned by the 
              read_corpus function)
-        5) limit = the probability limit that a prediction must exceed for that 
-            prediction to be assigned/passed on (usually .7, but defaults to 0 
-            if not assigned)
-
+        5) limit = the probability limit that a prediction must exceed for 
+             that prediction to be assigned/passed on (usually .7, but 
+             defaults to 0 if not assigned)
+    
     Output: This function returns a pandas DataFrame with the following features:
         
         1) Doc_Id = The index of provided document
@@ -147,7 +146,7 @@ def Doc2Vec_Sim_Estimates(model, train_corpus, limit=0):
     '''
     
     # Initialize the Dictionary to Return
-    estimates = pd.DataFrame(columns=['Doc_ID','Pred_Class','Pred_Prob'])
+    estimates = pd.DataFrame(columns=['Doc_ID','Sim_Pred_Class','Pred_Prob'])
 
     # Establish a For loop to loop over all documents
     for doc_id in range(len(train_corpus)):
@@ -165,8 +164,9 @@ def Doc2Vec_Sim_Estimates(model, train_corpus, limit=0):
             pred_class=0
             
         # Append the estimates to the estimates dataframe
-        estimates = estimates.append({'Doc_ID':doc_id, 'Sim_Pred_Class':pred_class,\
-                                      'Pred_Prob':pred_prob}, ignore_index=True)
+        estimates = estimates.append(
+                {'Doc_ID':doc_id, 'Sim_Pred_Class':pred_class, \
+                 'Pred_Prob':pred_prob}, ignore_index=True)
             
     return(estimates)
 
@@ -182,7 +182,7 @@ def Document_Similarity_Training(train, doc, target, limit=0):
          2) Trains a Doc2Vec model using the Doc2Vec_Training_Model_Sim function
          3) Produces and returns target estimates for every document in the 
             training set using the Doc2Vec_Estimates_Training function
-    
+        
     Input: This function requires the following inputs:
             
         1) train = a pandas DataFrame that contains the documents to be trained 
@@ -227,11 +227,11 @@ def Document_Similarity_Testing(test, doc, target, gensim_model, limit):
     
     It accomplishes this through the following steps/functions:
                  
-         1) Develops a testing corpus for the Doc2Vec model using the 
+        1) Develops a testing corpus for the Doc2Vec model using the 
             read_corpus_sim function
-         2) Produces and returns target estimates for every document in the 
-            training set using the Doc2Vec_Estimates_Training model provided 
-            to the function
+        2) Produces and returns target estimates for every document in 
+            the training set using the Doc2Vec_Estimates_Training model 
+            provided to the function
         
     Input: This function requires the following inputs:
             
@@ -257,3 +257,4 @@ def Document_Similarity_Testing(test, doc, target, gensim_model, limit):
     test_estimates = Doc2Vec_Sim_Estimates(gensim_model, test_corpus, limit)
     
     return(test_estimates)
+

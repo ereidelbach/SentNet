@@ -210,7 +210,7 @@ def Readability_Features(data, target):
 In this section, we define the function identify and extract all word/toaken based features from every document. These features will be the second input into our classification models.
 '''
 
-def Word_Features(data, target, limit):
+def Word_Features(data, doc, limit):
     
     '''
     Purpose: In this function we first clean a document (removing punctuation, stopword, etc).
@@ -235,13 +235,13 @@ def Word_Features(data, target, limit):
     unqiue_words = set()
     
     for index, row in data.iterrows():
-        temp_words = set(clean_words(row[target]))
+        temp_words = set(clean_words(row[doc]))
         unqiue_words = unqiue_words.union(temp_words)
     
     # Sklearn Matrix Builder
         
     # Append a new column to our original dataframe with a "cleaned" version of the document text
-    data['essay_clean'] = data.apply(lambda row: clean_sentence(row[target]),axis=1)
+    data['essay_clean'] = data.apply(lambda row: clean_sentence(row[doc]),axis=1)
     
     # Define the vocab list for the Sklearn vecotrizer to search over
     unique_words = list(unqiue_words)
@@ -554,7 +554,7 @@ def Word_Edge_Features(data, target, limit):
 
 #################### Word - Betweeness Centrality Extraction #######################        
 
-def Word_Centrality_Features(data, target, selected_words):
+def Word_Centrality_Features(data, doc, selected_words):
     '''
     Purpose: This function returns the "importance" of every word, within every document through the use of graph analysis through the following steps:
             
@@ -568,7 +568,7 @@ def Word_Centrality_Features(data, target, selected_words):
     Input: This function requires the following inputs:
         
             1) data = a pandas DataFrame that contains the documents for processing
-            2) target = the column/feature within the DataFrame that contains the original document text
+            2) doc = the column/feature within the DataFrame that contains the original document text
             3) selected_words = a list of words to calculate betweeness centrality scores for (note this list can be returned by Word_Features function).
         
     Output: A pandas DataFrame that contains the betweeness centrality of selected terms within all documents
@@ -582,7 +582,7 @@ def Word_Centrality_Features(data, target, selected_words):
     for index, row in data.iterrows():
         
         # Extract all edges from the docuemnt as touples
-        doc_edges = touple_edge_extractor(row['essay'])
+        doc_edges = touple_edge_extractor(row[doc])
         
         # Create a graph using all the edge inputs as touples
         G = nx.Graph()
@@ -792,7 +792,7 @@ def Synset_Edge_Features(data, target, limit):
 
 #################### Synset - Betweeness Centrality Extraction #######################      
 
-def Synset_Centrality_Features(data, target, selected_synsets):
+def Synset_Centrality_Features(data, doc, selected_synsets):
     '''
     Purpose: This function returns the "importance" of every synset, within every document through the use of graph analysis through the following steps:
             
@@ -806,7 +806,7 @@ def Synset_Centrality_Features(data, target, selected_synsets):
     Input: This function requires the following inputs:
         
             1) data = a pandas DataFrame that contains the documents for processing
-            2) target = the column/feature within the DataFrame that contains the original document text
+            2) doc = the column/feature within the DataFrame that contains the original document text
             3) selected_synset = a list of synset to calculate betweeness centrality scores for (note this list is returned by synset_Features function).
         
     Output: A pandas DataFrame that contains the betweeness centrality of selected synset within all documents
@@ -820,7 +820,7 @@ def Synset_Centrality_Features(data, target, selected_synsets):
     for index, row in data.iterrows():
         
         # Extract all edges from the docuemnt as touples
-        doc_edges = touple_edge_extractor_synset(row[target])
+        doc_edges = touple_edge_extractor_synset(row[doc])
         
         # Create a graph using all the edge inputs as touples
         G = nx.Graph()
