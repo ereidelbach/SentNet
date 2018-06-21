@@ -31,7 +31,7 @@ import random
 
 
 # Define the function to tokenize and tag documents required for Gensim
-def read_corpus(data, field, target, tokens_only=False):
+def read_corpus_sim(data, field, target, tokens_only=False):
     '''
     Purpose: This function prepares text for processing within the Gensim model by converting documents to the doc2vec.TaggedDocument class format. This involves:
         
@@ -51,7 +51,7 @@ def read_corpus(data, field, target, tokens_only=False):
     '''
     
     for index, row in data.iterrows():
-        if tokens_only:
+        if tokens_only==True:
             #yield gensim.utils.simple_preprocess(row[field])
             yield gensim.models.doc2vec.TaggedDocument(gensim.utils.simple_preprocess(row[field]))
         else:
@@ -60,7 +60,7 @@ def read_corpus(data, field, target, tokens_only=False):
 
 
 # Defining the function to train and return the Gensim Model
-def Doc2Vec_Training_Model(train_corpus):
+def Doc2Vec_Training_Model_Sim(train_corpus):
     '''
     Purpose: This function uses a tagged document to generate a Doc2Vec model that can be used to identify similar/matching documents.
         
@@ -75,7 +75,7 @@ def Doc2Vec_Training_Model(train_corpus):
     # Preprocess text for Doc2Vec Model
     
     # Train the Model
-    model = gensim.models.doc2vec.Doc2Vec(vector_size=200, min_count=6, epochs=100)
+    model = gensim.models.doc2vec.Doc2Vec(vector_size=200, min_count=6, epochs=1000)
     model.build_vocab(train_corpus)
     model.train(train_corpus, total_examples=model.corpus_count, epochs=model.epochs)
     
@@ -95,7 +95,7 @@ def Doc2Vec_Sim_Estimates(model, train_corpus, limit=0):
         
     Input: This function requires the following inputs:
         
-            1) model = a gensim.models.doc2vec.Doc2Vec object (can be generated using the Doc2Vec_Training_Model function)
+            1) model = a gensim.models.doc2vec.Doc2Vec object (can be generated using the Doc2Vec_Training_Model_Sim function)
             2) train_corpus = a doc2vec.TaggedDocument list (returned by the read_corpus function)
             5) limit = the probability limit that a prediction must exceed for that prediction to be assigned/passed on (usually .7, but defaults to 0 if not assigned)
     
@@ -108,7 +108,7 @@ def Doc2Vec_Sim_Estimates(model, train_corpus, limit=0):
     '''
     
     # Initialize the Dictionary to Return
-    estimates = pd.DataFrame(columns=['Doc_ID','Pred_Class','Pred_Prob'])
+    estimates = pd.DataFrame(columns=['Doc_ID','Sim_Pred_Class','Pred_Prob'])
 
     # Establish a For loop to loop over all documents
     for doc_id in range(len(train_corpus)):
@@ -125,7 +125,7 @@ def Doc2Vec_Sim_Estimates(model, train_corpus, limit=0):
             pred_class=0
             
         # Append the estimates to the estimates dataframe
-        estimates = estimates.append({'Doc_ID':doc_id, 'Pred_Class':pred_class, 'Pred_Prob':pred_prob}, ignore_index=True)
+        estimates = estimates.append({'Doc_ID':doc_id, 'Sim_Pred_Class':pred_class, 'Pred_Prob':pred_prob}, ignore_index=True)
             
     return(estimates)
 
@@ -135,8 +135,8 @@ def Document_Similarity_Training(train, doc, target, limit=0):
     Purpose: This function combines all the required document matching functions to produce target estimates for every document in a provided training set.
              It accomplishes this through the following steps/functions:
                  
-                 1) Develops a training corpus for the Doc2Vec model using the read_corpus function
-                 2) Trains a Doc2Vec model using the Doc2Vec_Training_Model function
+                 1) Develops a training corpus for the Doc2Vec model using the read_corpus_sim function
+                 2) Trains a Doc2Vec model using the Doc2Vec_Training_Model_Sim function
                  3) Produces and returns target estimates for every document in the training set using the Doc2Vec_Estimates_Training function
         
     Input: This function requires the following inputs:
@@ -155,10 +155,10 @@ def Document_Similarity_Training(train, doc, target, limit=0):
     '''
     
     # Develop Training Corpus
-    train_corpus = list(read_corpus(train, doc, target))
+    train_corpus = list(read_corpus_sim(train, doc, target))
     
     # Define Model
-    gensim_training_similiarity = Doc2Vec_Training_Model(train_corpus)
+    gensim_training_similiarity = Doc2Vec_Training_Model_Sim(train_corpus)
     
     # Obtain estimated document similarities
     train_esimates = Doc2Vec_Sim_Estimates(gensim_training_similiarity, train_corpus, limit)
@@ -166,12 +166,12 @@ def Document_Similarity_Training(train, doc, target, limit=0):
     return({'train_esimates':train_esimates, 'gensim_training_similiarity':gensim_training_similiarity})
 
 
-def Document_Similarity_Testing(train, doc, target, gensim_model, limit):
+def Document_Similarity_Testing(test, doc, target, gensim_model, limit):
     '''
     Purpose: This function combines all the required document matching functions to produce target estimates for every document in a provided testing set.
              It accomplishes this through the following steps/functions:
                  
-                 1) Develops a testing corpus for the Doc2Vec model using the read_corpus function
+                 1) Develops a testing corpus for the Doc2Vec model using the read_corpus_sim function
                  2) Produces and returns target estimates for every document in the training set using the Doc2Vec_Estimates_Training model provided to the function
         
     Input: This function requires the following inputs:
@@ -186,9 +186,10 @@ def Document_Similarity_Testing(train, doc, target, gensim_model, limit):
     '''
     
     # Develop Training Corpus
-    test_corpus = list(read_corpus(test, 'essay', target))
+    test_corpus = list(read_corpus_sim(test, 'essay', target))
     
     # Obtain estimated document similarities
     test_esimates = Doc2Vec_Sim_Estimates(gensim_model, test_corpus, limit)
     
     return(test_esimates)
+
