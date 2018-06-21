@@ -5,6 +5,10 @@ Created on Tue Jun 12 22:56:51 2018
 @author: GTayl
 """
 
+###############################################################################
+# Package Import
+###############################################################################
+
 # Read in the required packages
 import math
 import numpy as np
@@ -14,7 +18,6 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
 
 # import functions from other python files
-
 from Data_Ingest.SentNet_Data_Prep_Functions import Ingest_Training_Data
 
 #from SentNet_Data_Feature_Extraction_V3 import Readability_Features
@@ -36,12 +39,14 @@ Document_Similarity_Training, Document_Similarity_Testing
 # Data Ingest 
 ###############################################################################
 
-################################## .Docx Data Ingest ##########################
+# Establish the project root directory
+path_project_root = Path('SentNet_Training_Master.py').resolve().parent
 
-# This assumes the Set1 Data is in the path: SentNet\Data\Set1\docx\Images
-path_data = Path('Data','Set1','docx','Images')
+################################## .Docx Data Ingest ##########################
+# Assumes the Set1 Data is in the path: SentNet\Data\Set1\docx\Images
+path_data = Path(path_project_root, 'Data','Set1','docx','Images')
 # It will place your image files in: SentNet\Data\Set1\docx\Images\Unpacked
-path_images = Path('Data','Set1','docx','Images', 'Unpacked')
+path_images = Path(path_project_root,'Data','Set1','docx','Images', 'Unpacked')
 # Ingest the training data
 data_raw = Ingest_Training_Data(path_data, path_images)
 
