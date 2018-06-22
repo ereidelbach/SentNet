@@ -270,35 +270,43 @@ for i in train_test_diff:
 
 # test scoring model
 preds = rfc.predict(test_data[modeling_features])
-pred_crosstab = pd.crosstab(test[target],preds)
-print("TESTING")
-print(pred_crosstab)
-print(" ")
 
-accurate_count = 0
-for i in range(0,len(pred_crosstab-1)):
-    try:
-        accurate_count += pred_crosstab.iloc[i,i]
-    except:
-        pass
+###############################################################################################
+# Saving Results 
+###############################################################################################
+'''
+In a production system, depending on your exisisting data management systems/
+processes you could dump these results to a database or other location. As
+a temporary standin for a finalized solution, we write our results to an
+excel worksheet.
+'''
+date = str(datetime.date.today())
+file_name = ("SentNet_Scoring_Predictions_"+date+".xlsx")
+preds.to_excel(file_name)
 
-total_count = pred_crosstab.sum().sum()
-accuracy_rate = accurate_count/total_count
-print("Total Accuracy Rate: "+str(accuracy_rate))
 
-accuracy = pd.concat([pd.DataFrame(test[target]), pd.DataFrame(preds)],axis=1)
-accuracy['correct_pred'] = accuracy.apply(
-        lambda row: math.sqrt((row[target]-row[0])**2), axis=1)
-accuracy['correct_buffer'] = accuracy['correct_pred']<=1
-model_error = accuracy['correct_pred'].mean()
-print("Model Error: "+str(model_error))
+###############################################################################################
+# Saving Models & Modeling Features
+###############################################################################################
+'''
+While it would be beneficial to frequently retrain the random forest models as 
+new scored docuemnts become available, we forsee the need to score additional
+documents without retraining the model first. When this is the case, it would
+be more effecitve to simply import the already trained models (if your previous
+sesssion ended or shutdown) and simply run new observations through those models
+(as opposed to having to retrain the models from scratch). When this is the
+case we must export our final models and feature set so they can be imported
+later. To accomplish this we do the following:
+'''
 
-adjusted_accuracy = (accuracy['correct_buffer']==1).sum()/len(test)
-print("Adjusted Accuracy: "+str(adjusted_accuracy))
+# Saving the feature set
+date = str(datetime.date.today())
+feature_set_file_name = ("SentNet_Modeling_Feature_Set_"+date+".csv")
+modeling_features.to_csv(feature_set_file_name)
 
-model_results = {'model_error':model_error,
-                 'accuracy_rate':accuracy_rate,
-                 'adjusted_accuracy':adjusted_accuracy,
-                 'pred_crosstab':pred_crosstab,
-                 'feature_importance':feature_importance
-                 }
+# Saving the random forest model
+model_file_name = ("SentNet_Model_"+date+".cpickle")
+model_save_path = (str(os.getcwd())+"\\"+model_file_name)
+
+with open(model_save_path, 'wb') as f:
+    cPickle.dump(rfc, f)
