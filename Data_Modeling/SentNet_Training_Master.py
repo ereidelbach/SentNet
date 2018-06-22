@@ -10,8 +10,11 @@ Created on Tue Jun 12 22:56:51 2018
 ###############################################################################
 
 # Read in the required packages
+import pickle
+import datetime
 import math
 import numpy as np
+import os
 from pathlib import Path
 import pandas as pd
 from sklearn.ensemble import RandomForestClassifier
@@ -271,23 +274,31 @@ for i in train_test_diff:
 # test scoring model
 preds = rfc.predict(test_data[modeling_features])
 
-###############################################################################################
+###############################################################################
 # Saving Results 
-###############################################################################################
+###############################################################################
 '''
 In a production system, depending on your exisisting data management systems/
 processes you could dump these results to a database or other location. As
 a temporary standin for a finalized solution, we write our results to an
 excel worksheet.
 '''
-date = str(datetime.date.today())
+# create a date value for use in the model results file name
+date = str(datetime.datetime.now().isoformat(sep='_',timespec='seconds'))
 file_name = ("SentNet_Scoring_Predictions_"+date+".xlsx")
-preds.to_excel(file_name)
+
+# check to make sure a folder exists for exporting the data in the desired path
+dir_path = Path(path_project_root,'Model_Results')
+if os.path.isdir(dir_path) == False:
+    os.makedirs(dir_path)
+    
+# export the model results
+preds.to_csv(Path(dir_path,file_name))
 
 
-###############################################################################################
+###############################################################################
 # Saving Models & Modeling Features
-###############################################################################################
+###############################################################################
 '''
 While it would be beneficial to frequently retrain the random forest models as 
 new scored docuemnts become available, we forsee the need to score additional
@@ -298,15 +309,18 @@ sesssion ended or shutdown) and simply run new observations through those models
 case we must export our final models and feature set so they can be imported
 later. To accomplish this we do the following:
 '''
+# check to make sure a folder exists for exporting the data in the desired path
+dir_path = Path(path_project_root,'Model_Files')
+if os.path.isdir(dir_path) == False:
+    os.makedirs(dir_path)
 
 # Saving the feature set
-date = str(datetime.date.today())
-feature_set_file_name = ("SentNet_Modeling_Feature_Set_"+date+".csv")
+file_name = "SentNet_Modeling_Feature_Set_"+date+".csv"
+feature_set_file_name = (Path(dir_path,file_name))
 modeling_features.to_csv(feature_set_file_name)
 
 # Saving the random forest model
-model_file_name = ("SentNet_Model_"+date+".cpickle")
-model_save_path = (str(os.getcwd())+"\\"+model_file_name)
-
+model_file_name = ("SentNet_Model_"+date+".pkl")
+model_save_path = str(Path(dir_path,model_file_name))
 with open(model_save_path, 'wb') as f:
-    cPickle.dump(rfc, f)
+    pickle.dump(rfc, f)

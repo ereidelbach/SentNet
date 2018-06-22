@@ -27,21 +27,28 @@ the SentNet_Training_Master.py script.
 ###############################################################################
 
 # Read in the required packages
+import datetime
 import numpy as np
 from pathlib import Path
 import pandas as pd
+import pickle
 from sklearn.ensemble import RandomForestClassifier
 
 # import functions from other python files
 from Data_Ingest.SentNet_Data_Prep_Functions import Ingest_Training_Data
-#from SentNet_Data_Feature_Extraction_V3 import Readability_Features
+
 from Data_Preprocessing.SentNet_Data_Feature_Extraction import Word_Features, \
 Word_Edge_Features, Word_Centrality_Features, Synset_Features, \
-Synset_Edge_Features, Synset_Centrality_Features
-from Data_Modeling.Term_Clustering import Clustering_Features, Cluster_Concentrations, \
-Synset_Clustering_Features, Synset_Concentrations
-from Data_Modeling.SentNet_Document_Matching import Document_Matching_Training
-from Data_Modeling.SentNet_Document_Similarity import Document_Similarity_Training
+Synset_Edge_Features, Synset_Centrality_Features, Readability_Features
+
+from Data_Modeling.Term_Clustering import Clustering_Features, \
+Cluster_Concentrations, Synset_Clustering_Features, Synset_Concentrations
+
+from Data_Modeling.SentNet_Document_Matching import \
+Document_Matching_Training, Document_Matching_Testing
+
+from Data_Modeling.SentNet_Document_Similarity import \
+Document_Similarity_Training, Document_Similarity_Testing
 
 ###############################################################################
 # Data Ingest 
@@ -58,13 +65,15 @@ data_raw = Ingest_Training_Data(path_data, path_images)
 
 temp_list = []
 for index, row in data_raw.iterrows():
-    # luckily, everything is broken up by line splits so let's break up the text that way
+    # luckily, everything is broken up by line splits so let's break up the 
+    #   text that way
     doc_elements = row['Doc_Text'].split('\n')
     # delete empty elements
     doc_elements = [x for x in doc_elements if x != '']
     # remove any rows that are similar to 'Image 1', 'Image 2', etc...
     doc_elements = [x for x in doc_elements if 'Image ' not in x]
-    # create a dictionary where the key is the variable name and the value is score/text from the document
+    # create a dictionary where the key is the variable name and the value is 
+    #   score/text from the document
     doc_dict = {}
     for (key, value) in zip(doc_elements[::2], doc_elements[1::2]):
         doc_dict[key] = value
@@ -79,7 +88,7 @@ score = pd.DataFrame(temp_list)
 
 
 '''
-############################### Spreadsheet Data Ingest #######################################
+############################### Spreadsheet Data Ingest #######################
 # Alternatively read in data from a pre-populated spreadsheet (or database table)
 # This assumes we wish to read the csv located in the path: 
 #      SentNet\Data\Set1
@@ -103,52 +112,68 @@ modeling_features = list(pd.read_csv(path_to_features))
 
 # Read in Random Forest Model
 with open('path/to/file', 'rb') as f:
-    rfc = cPickle.load(f)
+    rfc = pickle.load(f)
 
-###############################################################################################
+###############################################################################
 # Model_Parameters
-###############################################################################################
+###############################################################################
 
-# Define the minimum threshold (the number of documents a feature must appear in) for a feature to be included in our analysis
+# Define the minimum threshold (the number of documents a feature must 
+#   appear in) for a feature to be included in our analysis
 limit = round(0.02*len(train))
 
 # The element/scorecard you are attempting to estimate
 target = 'domain1_score'
 
-# The name of the column in the dataframe which contains the document text to be scored
+# The name of the column in the dataframe which contains the document text 
+#   to be scored
 doc = 'essay'
 
-###############################################################################################
+###############################################################################
 # Feature Extraction 
-###############################################################################################
+###############################################################################
 # Calculate readability features for each document
 readability_features_score = Readability_Features(score, doc)
 
 # Matching (most similar) document score (Doc2Vec)
-matching_docs_score = Document_Matching_Testing(score, doc, target, scores_join, gensim_model_matching, limit=0)
+matching_docs_score = Document_Matching_Testing(
+        score, doc, target, scores_join, gensim_model_matching, limit=0)
 
 # General Similarity score (Doc2Vec)
-similar_docs_score = Document_Similarity_Testing(score, doc, target, gensim_model_similarity, limit=0)
+similar_docs_score = Document_Similarity_Testing(
+        score, doc, target, gensim_model_similarity, limit=0)
 
 # Calculate word level features for each document
 word_features_score = Word_Features(score, doc, limit=0)['word_matrix_features']
-word_features_score = word_features_score[word_features_score.columns.intersection(selected_words)]
+word_features_score = word_features_score[
+        word_features_score.columns.intersection(selected_words)]
 
 # Calculate word graph features for each document
-word_edge_features_score = Word_Edge_Features(score, doc, limit)['edges_matrix_features']
-word_edge_features_score = word_edge_features_score[word_edge_features_score.columns.intersection(list(set(word_edge_list['edge_id'])))]
-word_centrality_features_score = Word_Centrality_Features(score, doc, selected_words)
+word_edge_features_score = Word_Edge_Features(
+        score, doc, limit)['edges_matrix_features']
+word_edge_features_score = word_edge_features_score[
+        word_edge_features_score.columns.intersection(
+                list(set(word_edge_list['edge_id'])))]
+word_centrality_features_score = Word_Centrality_Features(
+        score, doc, selected_words)
 word_cluster_features_score = Cluster_Concentrations(score, doc, word_clusters)
 
 # Calculate synset level features for each document
-synset_features_score = Synset_Features(score, doc, limit=0)['synset_matrix_features']
-synset_features_score = synset_features_score[synset_features_score.columns.intersection(selected_synsets)]
+synset_features_score = Synset_Features(
+        score, doc, limit=0)['synset_matrix_features']
+synset_features_score = synset_features_score[
+        synset_features_score.columns.intersection(selected_synsets)]
 
 # Calculate synset graph features for each document
-synset_edge_features_score = Synset_Edge_Features(score, doc, limit)['edges_matrix_features_synset']
-synset_edge_features_score = synset_edge_features_score[synset_edge_features_score.columns.intersection(list(set(synset_edge_list['edge_id'])))]
-synset_centrality_features_score = Synset_Centrality_Features(score, doc, selected_synsets)
-synset_cluster_features_score = Synset_Concentrations(score, doc, synset_clusters)
+synset_edge_features_score = Synset_Edge_Features(
+        score, doc, limit)['edges_matrix_features_synset']
+synset_edge_features_score = synset_edge_features_score[
+        synset_edge_features_score.columns.intersection(
+                list(set(synset_edge_list['edge_id'])))]
+synset_centrality_features_score = Synset_Centrality_Features(
+        score, doc, selected_synsets)
+synset_cluster_features_score = Synset_Concentrations(
+        score, doc, synset_clusters)
 
 # Preparing dataset for predictions
 score_data = pd.concat([readability_features_score, 
@@ -174,15 +199,15 @@ train_test_diff = list(set(modeling_features)-set(score_data.columns))
 for i in train_test_diff:
     score_data[i]=0
 
-###############################################################################################
+###############################################################################
 # Model Scoring
-###############################################################################################
+###############################################################################
     
 preds = rfc.predict(score_data[modeling_features])
 
-###############################################################################################
+###############################################################################
 # Saving Results 
-###############################################################################################
+###############################################################################
 '''
 In a production system, depending on your exisisting data management systems/
 processes you could dump these results to a database or other location. As

@@ -1,3 +1,4 @@
+#!/usr/bin/env python3.6
 # -*- coding: utf-8 -*-
 """
 Created on Fri May 25 23:05:55 2018
@@ -5,11 +6,15 @@ Created on Fri May 25 23:05:55 2018
 @author: GTayl
 Derived From: https://github.com/ascribe/image-match/blob/master/image_match/goldberg.py
 
-#################### LICENCE #######################
-All code is licensed under the Apache License, Version 2.0, the full text of which can be found at http://www.apache.org/licenses/LICENSE-2.0.
-####################################################
+############################### LICENSE #######################################
+All code is licensed under the Apache License, Version 2.0, the full text of 
+which can be found at http://www.apache.org/licenses/LICENSE-2.0.
+###############################################################################
 """
 
+#==============================================================================
+# Package Import
+#==============================================================================
 # install via (conda install scikit-image or pip install scikit-image)
 from skimage.color import rgb2gray
 from skimage.io import imread
@@ -24,13 +29,17 @@ import numpy as np
 import xml.etree
 
 
+#==============================================================================
+# Class/Function Definitions
+#==============================================================================
 class CorruptImageError(RuntimeError):
     pass
 
 
 class ImageSignature(object):
     """Image signature generator.
-    Based on the method of Goldberg, et al. Available at http://www.cs.cmu.edu/~hcwong/Pdfs/icip02.ps
+    Based on the method of Goldberg, et al. 
+    Available at http://www.cs.cmu.edu/~hcwong/Pdfs/icip02.ps
     """
 
     def __init__(self, n=9, crop_percentiles=(5, 95), P=None, diagonal_neighbors=True,
@@ -40,17 +49,19 @@ class ImageSignature(object):
         Note:
             Non-default parameters have not been extensively tested. Use carefully.
         Args:
-            n (Optional[int]): size of grid imposed on image. Grid is n x n (default 9)
-            crop_percentiles (Optional[Tuple[int]]): lower and upper bounds when considering how much
-                variance to keep in the image (default (5, 95))
-            P (Optional[int]): size of sample region, P x P. If none, uses a sample region based
-                on the size of the image (default None)
-            diagonal_neighbors (Optional[boolean]): whether to include diagonal grid neighbors
-                (default True)
-            identical_tolerance (Optional[float]): cutoff difference for declaring two adjacent
-                grid points identical (default 2/255)
-            n_levels (Optional[int]): number of positive and negative groups to stratify neighbor
-                differences into. n = 2 -> [-2, -1, 0, 1, 2] (default 2)
+            - n (Optional[int]): size of grid imposed on image. Grid is n x n 
+                (default 9) crop_percentiles (Optional[Tuple[int]]): lower and 
+                upper bounds when considering how much variance to keep in the 
+                image (default (5, 95))
+            - P (Optional[int]): size of sample region, P x P. If none, uses a 
+                sample region based on the size of the image (default None)
+                diagonal_neighbors (Optional[boolean]): whether to include 
+                diagonal grid neighbors (default True)
+            - identical_tolerance (Optional[float]): cutoff difference for 
+                declaring two adjacent grid points identical (default 2/255)
+            - n_levels (Optional[int]): number of positive and negative groups 
+                to stratify neighbor differences into. n = 2 -> 
+                [-2, -1, 0, 1, 2] (default 2)
         """
 
         # check inputs
@@ -106,8 +117,8 @@ class ImageSignature(object):
         """Generates an image signature.
         See section 3 of Goldberg, et al.
         Args:
-            path_or_image (string or numpy.ndarray): image path, or image array
-            bytestream (Optional[boolean]): will the image be passed as raw bytes?
+            - path_or_image (string or numpy.ndarray): image path, or image array
+           -  bytestream (Optional[boolean]): will the image be passed as raw bytes?
                 That is, is the 'path_or_image' argument an in-memory image?
                 (default False)
         Returns:
@@ -258,16 +269,19 @@ class ImageSignature(object):
         """Crops an image, removing featureless border regions.
         Corresponds to the first part of 'step 2' in Goldberg's paper
         Args:
-            image (numpy.ndarray): n x m array of floats -- the greyscale image. Typically, the
-                output of preprocess_image
-            lower_percentile (Optional[int]): crop image by percentage of difference (default 5)
-            upper_percentile (Optional[int]): as lower_percentile (default 95)
-            fix_ratio (Optional[boolean]): use the larger ratio for both directions. This is useful
-                for using the fast signature transforms on sparse but very similar images (e.g.
-                renderings from fixed directions). Use with care -- only use if you can guarantee the
-                incoming image is square (default False).
+            - image (numpy.ndarray): n x m array of floats -- the greyscale 
+                image. Typically, the output of preprocess_image
+            - lower_percentile (Optional[int]): crop image by percentage of 
+                difference (default 5)
+            - upper_percentile (Optional[int]): as lower_percentile (default 95)
+            - fix_ratio (Optional[boolean]): use the larger ratio for both 
+                directions. This is useful for using the fast signature 
+                transforms on sparse but very similar images (e.g. renderings 
+                from fixed directions). Use with care -- only use if you can 
+                guarantee the incoming image is square (default False).
         Returns:
-            A pair of tuples describing the 'window' of the image to use in analysis: [(top, bottom), (left, right)]
+            A pair of tuples describing the 'window' of the image to use in 
+            analysis: [(top, bottom), (left, right)]
         Examples:
             >>> img = gis.preprocess_image('https://pixabay.com/static/uploads/photo/2012/11/28/08/56/mona-lisa-67506_960_720.jpg')
             >>> gis.crop_image(img)
@@ -318,13 +332,14 @@ class ImageSignature(object):
         """Computes grid points for image analysis.
         Corresponds to the second part of 'step 2' in the paper
         Args:
-            image (numpy.ndarray): n x m array of floats -- the greyscale image. Typically,
-                the output of preprocess_image
-            n (Optional[int]): number of gridpoints in each direction (default 9)
-            window (Optional[List[Tuple[int]]]): limiting coordinates [(t, b), (l, r)], typically the
-                output of (default None)
+            - image (numpy.ndarray): n x m array of floats -- the greyscale 
+                image. Typically, the output of preprocess_image
+            - n (Optional[int]): number of gridpoints in each direction (default 9)
+            - window (Optional[List[Tuple[int]]]): limiting coordinates 
+                [(t, b), (l, r)], typically the output of (default None)
         Returns:
-            tuple of arrays indicating the vertical and horizontal locations of the grid points
+            tuple of arrays indicating the vertical and horizontal locations 
+            of the grid points
         Examples:
             >>> img = gis.preprocess_image('https://pixabay.com/static/uploads/photo/2012/11/28/08/56/mona-lisa-67506_960_720.jpg')
             >>> window = gis.crop_image(img)
@@ -347,11 +362,11 @@ class ImageSignature(object):
         """Computes array of greyness means.
         Corresponds to 'step 3'
         Args:
-            image (numpy.ndarray): n x m array of floats -- the greyscale image. Typically,
-                the output of preprocess_image
-            x_coords (numpy.ndarray): array of row numbers
-            y_coords (numpy.ndarray): array of column numbers
-            P (Optional[int]): size of boxes in pixels (default None)
+            - image (numpy.ndarray): n x m array of floats -- the greyscale 
+                image. Typically, the output of preprocess_image
+            - x_coords (numpy.ndarray): array of row numbers
+            - y_coords (numpy.ndarray): array of column numbers
+            - P (Optional[int]): size of boxes in pixels (default None)
         Returns:
             an N x N array of average greyscale around the gridpoint, where N is the
                 number of grid points
@@ -404,18 +419,18 @@ class ImageSignature(object):
         Returns n x n x 8 rank 3 array for an n x n grid (if diagonal_neighbors == True)
         The n x nth coordinate corresponds to a grid point.  The eight values are
         the differences between neighboring grid points, in this order:
-        upper left
-        upper
-        upper right
-        left
-        right
-        lower left
-        lower
-        lower right
+            - upper left
+            - upper
+            - upper right
+            - left
+            - right
+            - lower left
+            - lower
+            - lower right
         Args:
-            grey_level_matrix (numpy.ndarray): grid of values sampled from image
-            diagonal_neighbors (Optional[boolean]): whether or not to use diagonal
-                neighbors (default True)
+            - grey_level_matrix (numpy.ndarray): grid of values sampled from image
+            - diagonal_neighbors (Optional[boolean]): whether or not to use 
+                diagonal neighbors (default True)
         Returns:
             a n x n x 8 rank 3 numpy array for an n x n grid (if diagonal_neighbors == True)
         Examples:
@@ -492,12 +507,13 @@ class ImageSignature(object):
         """Normalizes difference matrix in place.
         'Step 4' of the paper.  The flattened version of this array is the image signature.
         Args:
-            difference_array (numpy.ndarray): n x n x l array, where l are the differences between
-                the grid point and its neighbors. Typically the output of compute_differentials
-            identical_tolerance (Optional[float]): maximum amount two gray values can differ and
-                still be considered equivalent (default 2/255)
-            n_levels (Optional[int]): bin differences into 2 n + 1 bins (e.g. n_levels=2 -> [-2, -1,
-                0, 1, 2])
+            - difference_array (numpy.ndarray): n x n x l array, where l are 
+                the differences between the grid point and its neighbors. 
+                Typically the output of compute_differentials
+            - identical_tolerance (Optional[float]): maximum amount two gray 
+                values can differ and still be considered equivalent (default 2/255)
+            - n_levels (Optional[int]): bin differences into 2 n + 1 bins 
+                (e.g. n_levels=2 -> [-2, -1, 0, 1, 2])
         Examples:
             >>> img = gis.preprocess_image('https://pixabay.com/static/uploads/photo/2012/11/28/08/56/mona-lisa-67506_960_720.jpg')
             >>> window = gis.crop_image(img)

@@ -26,8 +26,9 @@ Created on Sun Jun 10 18:23:08 2018
         * import library via the command:  'import docx2txt'
     
 :TODO:
-    - Link with Hashing function to process any images contained in the .docx
-        file and then create a variable which contains the hashing information
+    - Link with Hashing functions in Data_Processing/Goldberg_Perceptual_Hashing.py
+        to process any images contained in the .docx file and then create a 
+        variable which contains the hashing information
 """
  
 #==============================================================================
