@@ -27,7 +27,8 @@ from Data_Ingest.SentNet_Data_Prep_Functions import Ingest_Training_Data
 
 from Data_Preprocessing.SentNet_Data_Feature_Extraction import Word_Features, \
 Word_Edge_Features, Word_Centrality_Features, Synset_Features, \
-Synset_Edge_Features, Synset_Centrality_Features, Readability_Features
+Synset_Edge_Features, Synset_Centrality_Features, Readability_Features, \
+Unpack_Image_Hashes, Return_Image_Score
 
 from Data_Modeling.Term_Clustering import Clustering_Features, \
 Cluster_Concentrations, Synset_Clustering_Features, Synset_Concentrations
@@ -70,6 +71,7 @@ for index, row in data_raw.iterrows():
     # throw in the other row info into the dict
     doc_dict['Doc_Title'] = row['Doc_Title']
     doc_dict['Doc_Images'] = row['Doc_Images']
+    doc_dict['Doc_Hashes'] = row['Doc_Hashes']
     temp_list.append(doc_dict)
    
 # turn the list of dictionaries into a new dataframe with all the the info
@@ -106,6 +108,10 @@ test.reset_index(drop=True, inplace=True)
 limit = round(0.02*len(train))
 target = 'domain1_score'
 doc = 'essay'
+
+# Converting target to int for modeling
+train[target] = pd.to_numeric(train[target], errors='coerce')
+test[target] = pd.to_numeric(test[target], errors='coerce')
 
 # Calculate readability features for each document
 readability_features = Readability_Features(train, doc)
@@ -150,6 +156,11 @@ synset_centrality_features = Synset_Centrality_Features(
 synset_clusters = Synset_Clustering_Features(synset_edge_list, limit)
 synset_cluster_features = Synset_Concentrations(train, doc, synset_clusters)
 
+# Image Hashing
+Image_Hashes = Unpack_Image_Hashes(train, 'Doc_Hashes', target)
+train['Image_Avg_Score']= train.apply(lambda row: Return_Image_Score(row, 'Doc_Hashes', Image_Hashes), axis=1)
+
+
 ###############################################################################
 # Modeling 
 ###############################################################################
@@ -165,12 +176,14 @@ train_data = pd.concat([readability_features,
                         synset_features,
                         synset_edge_features,
                         synset_centrality_features,
-                        synset_cluster_features
+                        synset_cluster_features,
+                        train['Image_Avg_Score']
                         ]
                         ,axis=1)
 
 train_data = train_data.replace('N/A',0)
 train_data = train_data.replace(np.nan,0)
+train_data = train_data.replace('.',0)
 train_data = train_data.loc[:,~train_data.columns.duplicated()]
 
 # Train inital random forest for feature selection
@@ -247,6 +260,9 @@ synset_centrality_features_score = Synset_Centrality_Features(
         test, doc, selected_synsets)
 synset_cluster_features_score = Synset_Concentrations(test, doc, synset_clusters)
 
+# Image Hashing
+test['Image_Avg_Score']= test.apply(lambda row: Return_Image_Score(row, 'Doc_Hashes', Image_Hashes), axis=1)
+
 # Preparing dataset for predictions
 test_data = pd.concat([readability_features_score, 
                         matching_docs_score['Matching_Pred_Class'], 
@@ -258,12 +274,14 @@ test_data = pd.concat([readability_features_score,
                         synset_features_score,
                         synset_edge_features_score,
                         synset_centrality_features_score,
-                        synset_cluster_features_score
+                        synset_cluster_features_score,
+                        test['Image_Avg_Score']
                         ]
                         ,axis=1)
 
 test_data = test_data.replace('N/A',0)
 test_data = test_data.replace(np.nan,0)
+test_data = test_data.replace('.',0)
 test_data = test_data.loc[:,~test_data.columns.duplicated()]
 
 train_test_diff = list(set(modeling_features)-set(test_data.columns))
@@ -273,6 +291,7 @@ for i in train_test_diff:
 
 # test scoring model
 preds = rfc.predict(test_data[modeling_features])
+preds = pd.DataFrame(preds)
 
 ###############################################################################
 # Saving Results 
@@ -318,6 +337,10 @@ if os.path.isdir(dir_path) == False:
 file_name = "SentNet_Modeling_Feature_Set_"+date+".csv"
 feature_set_file_name = (Path(dir_path,file_name))
 modeling_features.to_csv(feature_set_file_name)
+
+#Saving the Image Hashes
+image_hash_set_file_name = ("SentNet_Modeling_Image_Hash_Set_"+date+".csv")
+Image_Hashes.to_csv(feature_set_file_name)
 
 # Saving the random forest model
 model_file_name = ("SentNet_Model_"+date+".pkl")
