@@ -838,6 +838,85 @@ def Synset_Centrality_Features(data, doc, selected_synsets):
     
     print("Done Synset Graph Generation")
     return(synset_centrality_matrix)
+    
+###############################################################################################
+# Image Hashing 
+###############################################################################################
+''' 
+In this section we define the functions necessary to perform perceptual hashing (image based) that will allow SentNet to identify similar images/graphs across documents.
+'''
+
+# Unpack Hash list from the raw data ingest
+
+def Unpack_Image_Hashes(data, images, target):
+    '''
+    Purpose:
+        
+    Input:
+        
+    Output:
+        
+    '''
+    
+    # p = Unpack_Image_Hashes(data, 'Doc_Hashes', target)
+    # Define a dataframe to hodl results
+    image_df = pd.DataFrame()
+    
+    # Define a loop to unpack all the hashes
+    for index, row in data.iterrows():
+        
+        # Establish Values for that docuemnt
+        doc_name = row['Doc_Title']
+        doc_score = row[target]
+        
+        # Iterate through and append the image hash for each image (as long as it is not blank)
+        for i in row[images]:
+            if i.min()<0 or i.max()>0:
+                image_df = image_df.append({'Doc_Title':doc_name, 'Doc_Score':doc_score, 'Image':i}, ignore_index=True)
+            else:
+                #If the matrix has all zero values then it is blank and can be ignored
+                pass
+    
+    return(image_df)
+    
+    
+def Return_Image_Score(row, hashes, image_df):
+    '''
+    Purpose:
+        
+    Input:
+        
+    Output:
+        
+    '''
+    
+    final_value = 0
+    image_count = 0
+    
+    for i in row[hashes]:
+        temp_image_df = image_df
+        
+        if i.min()==0 and i.max()==0:
+            pass
+        
+        else:
+            temp_image_df['match_value'] = temp_image_df.apply(lambda row: gis.normalized_distance(i, row['Image']), axis=1)
+            temp_image_df = temp_image_df.sort_values(['match_value'], ascending=False)
+            
+            # Drop the first observation otherwise a image will match itself
+            temp_image_df = temp_image_df[temp_image_df['match_value']>=.75][1:len(temp_image_df)]
+            temp_value = temp_image_df['Doc_Score'].mean()
+        
+            final_value += temp_value
+            image_count += 1
+    
+    if final_value==0:
+        return(np.nan)
+    else:
+        return(final_value/image_count)
+
+
+
 
 
 ###############################################################################################
