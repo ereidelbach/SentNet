@@ -237,10 +237,10 @@ def Ingest_Training_Data(doc_folder_path, img_dir):
     for d in Docx_list:
         try:
             temp_df = Extract_Docx_Features(doc_folder_path, d, img_dir)
+            Training_Data = Training_Data.append({'Doc_Title':temp_df['file_name'], 'Doc_Text':temp_df['text'],'Doc_Images':temp_df['image_list']}, ignore_index=True)
         except:
             print("Error importing "+str(d)+" - File may 1) Be open in another program, 2) Not a true .docx file, 3) a temporary file or 4) corrupted.")
             pass
-        Training_Data = Training_Data.append({'Doc_Title':temp_df['file_name'], 'Doc_Text':temp_df['text'],'Doc_Images':temp_df['image_list']}, ignore_index=True)
     
     # Return the a data frame with the final features
     return(Training_Data)
