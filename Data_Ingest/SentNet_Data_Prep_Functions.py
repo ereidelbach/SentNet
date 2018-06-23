@@ -12,10 +12,11 @@ import zipfile
 import argparse
 import re
 import xml.etree.ElementTree as ET
-import zipfile
 import os
 import sys
 import pandas as pd
+from goldberg import ImageSignature
+gis = ImageSignature()
 
 nsmap = {'w': 'http://schemas.openxmlformats.org/wordprocessingml/2006/main'}
 
@@ -182,6 +183,7 @@ def Extract_Docx_Features(doc_folder_path, file_name, img_dir):
     
     text = u''
     image_list = []
+    image_hash_list = []
 
     # unzip the docx in memory
     zipf = zipfile.ZipFile(file_path)
@@ -214,9 +216,14 @@ def Extract_Docx_Features(doc_folder_path, file_name, img_dir):
                 with open(dst_fname, "wb") as dst_f:
                     dst_f.write(zipf.read(fname))
                     image_list.append(str(file_name)[:-5]+"_"+os.path.basename(fname))
+                    try:
+                        image_hash_list.append(gis.generate_signature(dst_fname))
+                    except:
+                        print("Could not develop an image signature for "+str(dst_fname))
+                        pass
 
     zipf.close()
-    return({'file_name':file_name, 'text':text.strip(), 'image_list':image_list})
+    return({'file_name':file_name, 'text':text.strip(), 'image_list':image_list, 'image_hash_list':image_hash_list})
 
 
 def Ingest_Training_Data(doc_folder_path, img_dir):
@@ -228,7 +235,7 @@ def Ingest_Training_Data(doc_folder_path, img_dir):
     '''
     
     # Initalize a dataframe to hold results
-    Training_Data = pd.DataFrame(columns=['Doc_Title','Doc_Text','Doc_Images'])
+    Training_Data = pd.DataFrame(columns=['Doc_Title','Doc_Text','Doc_Images','Doc_Hashes'])
     
     # Retrive all .docx files from the provided folder
     Docx_list = Docx_File_Selector(doc_folder_path)
@@ -237,18 +244,10 @@ def Ingest_Training_Data(doc_folder_path, img_dir):
     for d in Docx_list:
         try:
             temp_df = Extract_Docx_Features(doc_folder_path, d, img_dir)
-            Training_Data = Training_Data.append({'Doc_Title':temp_df['file_name'], 'Doc_Text':temp_df['text'],'Doc_Images':temp_df['image_list']}, ignore_index=True)
+            Training_Data = Training_Data.append({'Doc_Title':temp_df['file_name'], 'Doc_Text':temp_df['text'],'Doc_Images':temp_df['image_list'], 'Doc_Hashes':temp_df['image_hash_list']}, ignore_index=True)
         except:
             print("Error importing "+str(d)+" - File may 1) Be open in another program, 2) Not a true .docx file, 3) a temporary file or 4) corrupted.")
             pass
-    
+
     # Return the a data frame with the final features
     return(Training_Data)
-    
-
-
-        
-    
-    
-    
-    
