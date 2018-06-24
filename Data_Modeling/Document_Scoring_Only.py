@@ -1,32 +1,27 @@
+#!/usr/bin/env python3.6
 # -*- coding: utf-8 -*-
 """
-Created on Wed Jun 20 22:20:05 2018
+:DESCRIPTION:
+    While it would be beneficial to frequently retrain the random forest models 
+    as new scored docuemnts become available, we forsee the need to score 
+    additional documents without retraining the SentNet models first. 
+    
+    When this is the case, it would be more effective to import the already 
+    trained models (if your previous sesssion ended or shutdown) and simply 
+    run new observations through those models(as opposed to having to retrain 
+    the models from scratch). When this is the case we can use the script below 
+    to score new observations/documents using an existing model.
 
-@author: GTayl
+:REQUIRES:
+    Note: This requires that you outpt the final model and feature set as part 
+    of the SentNet_Training_Master.py script. 
+    
+:TODO:
+    NONE
 """
-
-###############################################################################
-# Scoring New Observations Only
-###############################################################################
-'''
-While it would be beneficial to frequently retrain the random forest models as 
-new scored docuemnts become available, we forsee the need to score additional
-documents without retraining the SentNet models first. When this is the case, 
-it wouldbe more effecitve to import the already trained models (if your 
-previoussesssion ended or shutdown) and simply run new observations through 
-those models(as opposed to having to retrain the models from scratch). When 
-this is the case we can use the script below to score new observations/
-documents using an existing model.
-
-Note this requires that you outpt the final model and feature set as part of
-the SentNet_Training_Master.py script.
-'''
-
-###############################################################################
-# Reading in Required Packages
-###############################################################################
-
-# Read in the required packages
+#==============================================================================
+# Package Import
+#==============================================================================
 import datetime
 import numpy as np
 from pathlib import Path
@@ -50,9 +45,9 @@ Document_Matching_Training, Document_Matching_Testing
 from Data_Modeling.SentNet_Document_Similarity import \
 Document_Similarity_Training, Document_Similarity_Testing
 
-###############################################################################
+#==============================================================================
 # Data Ingest 
-###############################################################################
+#==============================================================================
 
 ################################## .Docx Data Ingest ##########################
 
@@ -100,10 +95,9 @@ score.reset_index(drop=True, inplace=True)
 print("Done Data Ingest")
 '''
 
-###############################################################################
+#==============================================================================
 # Model Ingest 
-###############################################################################
-
+#==============================================================================
 path_to_features = "INPUT PATH TO SAVED FEATURES HERE"
 path_to_model = "INPUT PATH TO MODEL HERE"
 
@@ -114,9 +108,9 @@ modeling_features = list(pd.read_csv(path_to_features))
 with open('path/to/file', 'rb') as f:
     rfc = pickle.load(f)
 
-###############################################################################
+#==============================================================================
 # Model_Parameters
-###############################################################################
+#==============================================================================
 
 # Define the minimum threshold (the number of documents a feature must 
 #   appear in) for a feature to be included in our analysis
@@ -129,9 +123,9 @@ target = 'domain1_score'
 #   to be scored
 doc = 'essay'
 
-###############################################################################
+#==============================================================================
 # Feature Extraction 
-###############################################################################
+#==============================================================================
 # Calculate readability features for each document
 readability_features_score = Readability_Features(score, doc)
 
@@ -199,15 +193,14 @@ train_test_diff = list(set(modeling_features)-set(score_data.columns))
 for i in train_test_diff:
     score_data[i]=0
 
-###############################################################################
+#==============================================================================
 # Model Scoring
-###############################################################################
-    
+#==============================================================================    
 preds = rfc.predict(score_data[modeling_features])
 
-###############################################################################
+#==============================================================================
 # Saving Results 
-###############################################################################
+#==============================================================================
 '''
 In a production system, depending on your exisisting data management systems/
 processes you could dump these results to a database or other location. As

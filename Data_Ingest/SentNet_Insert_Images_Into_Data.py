@@ -1,10 +1,6 @@
 #!/usr/bin/env python3.6
 # -*- coding: utf-8 -*-
 """
-Created on Sun Jun 10 18:23:08 2018
-
-@author: Eric Reidelbach
-
 :DESCRIPTION:
     - This script will inject report-related images (i.e. bar charts, line
         charts) into our training and test data for the purposes of simulating

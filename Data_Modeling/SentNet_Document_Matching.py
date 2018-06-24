@@ -1,33 +1,25 @@
+#!/usr/bin/env python3.6
 # -*- coding: utf-8 -*-
 """
-Created on Sat Jun  9 01:10:33 2018
+:DESCRIPTION:
+    In this file we define the functions that are required to perform document 
+    matching with SentNet using a Doc2Vec model implimented in Gensim.
 
-@author: GTayl
+:REQUIRES:
+    NONE
+    
+:TODO:
+    NONE
 """
-
-# =============================================================================
-# Overview
-# =============================================================================
-'''
-In this file we define the functions that are required to perform document 
-matching with SentNet using a Doc2Vec model implimented in Gensim.
-'''
-
-# =============================================================================
-# Document Matching Set-up
-# =============================================================================
-
-# Import the required packages
+#==============================================================================
+# Package Import
+#==============================================================================
 import gensim
-import os
-import collections
-import smart_open
-import random
 import pandas as pd
 
-# =============================================================================
-# Document Matching Functions
-# =============================================================================
+#==============================================================================
+# Function Definitions / Reference Variable Declaration
+#==============================================================================
 
 # Defining Functions for Document Matching            
 def read_corpus(data, field, tokens_only=False):

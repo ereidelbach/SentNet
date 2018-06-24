@@ -1,10 +1,6 @@
 #!/usr/bin/env python3.6
 # -*- coding: utf-8 -*-
 """
-Created on Sat Jun  2 14:53:55 2018
-
-@author: Eric
-
 :DESCRIPTION:
     - The purpose of this script is to break up the Kaggle training set and
         validation set data into individual .docx and .txt documents to

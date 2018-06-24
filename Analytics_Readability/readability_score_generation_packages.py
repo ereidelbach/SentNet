@@ -1,10 +1,6 @@
 #!/usr/bin/env python3.6
 # -*- coding: utf-8 -*-
 """
-Created on Mon May 28 17:54:21 2018
-
-@author: Eric Reidelbach
-
 :DESCRIPTION:
     - The purpose of this script is to generate Interpretability and 
         Readability scores for text documents based on the following five indices:
@@ -31,12 +27,10 @@ Created on Mon May 28 17:54:21 2018
 #==============================================================================
 # Package Import
 #==============================================================================
-import os
-import pandas as pd
-#import spacy
-#spacy.load('en')
 from textstat.textstat import textstat
 from textatistic import Textatistic
+#import spacy
+#spacy.load('en')
 #import textacy
 
 #==============================================================================

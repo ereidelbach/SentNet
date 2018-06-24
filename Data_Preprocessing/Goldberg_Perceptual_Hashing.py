@@ -1,17 +1,21 @@
 #!/usr/bin/env python3.6
 # -*- coding: utf-8 -*-
 """
-Created on Fri May 25 23:05:55 2018
+:DESCRIPTION:
+    Derived From: 
+        https://github.com/ascribe/image-match/blob/master/image_match/goldberg.py    
 
-@author: GTayl
-Derived From: https://github.com/ascribe/image-match/blob/master/image_match/goldberg.py
+    ############################### LICENSE ###################################
+    All code is licensed under the Apache License, Version 2.0, the full text of 
+    which can be found at http://www.apache.org/licenses/LICENSE-2.0.
+    ###########################################################################
 
-############################### LICENSE #######################################
-All code is licensed under the Apache License, Version 2.0, the full text of 
-which can be found at http://www.apache.org/licenses/LICENSE-2.0.
-###############################################################################
+:REQUIRES:
+    NONE
+    
+:TODO:
+    NONE
 """
-
 #==============================================================================
 # Package Import
 #==============================================================================

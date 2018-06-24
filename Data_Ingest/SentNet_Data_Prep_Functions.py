@@ -1,82 +1,99 @@
+#!/usr/bin/env python3.6
 # -*- coding: utf-8 -*-
 """
-Created on Mon May 21 23:02:05 2018
-
-@author: GTayl
+:DESCRIPTION:
+    This script makes use of several functions to extract text and images 
+    from all .docx documents contained in a specified folder to facilitate
+    further analysis by SentNet.
+       
+:REQUIRES:
+    - Python-Docx package (https://python-docx.readthedocs.io/en/latest/)
+        * install via the command:  'pip install python-docx'
+        * call library via the command: 'import docx'
+    
+:TODO:
+    NONE
 """
-
-# Import the required packages
-from os import listdir
-from os.path import isfile, join
-import zipfile
-import argparse
-import re
-import xml.etree.ElementTree as ET
-import os
-import sys
-import pandas as pd
+#==============================================================================
+# Package Import
+#==============================================================================
 from goldberg import ImageSignature
 gis = ImageSignature()
+import os
+from os.path import isfile, join
+from os import listdir
+import pandas as pd
+import re
+import xml.etree.ElementTree as ET
+import zipfile
 
+
+#==============================================================================
+# Function Definitions / Reference Variable Declaration
+#==============================================================================
 nsmap = {'w': 'http://schemas.openxmlformats.org/wordprocessingml/2006/main'}
 
 def File_Selector_Training(path):
     '''
     Input: Path to a given folder/repository
-    Output: Returns a list of files in the provided directory that end in .tsv, .csv, or .xlsx.
+    Output: Returns a list of files in the provided directory that end in .tsv, 
+        .csv, or .xlsx.
     
-    Purpose: This allows for the scored training data to be read in from one or multuiple files.
-             Data in these sheets must be provided in the accepted format (example spreadsheet has been provided).
+    Purpose: This allows for the scored training data to be read in from one or 
+        multuiple files. Data in these sheets must be provided in the accepted 
+        format (example spreadsheet has been provided).
              
-             Col_1_UUID, Col_2_ScoreCard_Name, Col_3_Doc_Text, Col_4_List_of_JPEGs, Col_5_Criteria_1 .... Col_N_Criteria_N
+        Col_1_UUID, Col_2_ScoreCard_Name, Col_3_Doc_Text, Col_4_List_of_JPEGs, 
+        Col_5_Criteria_1 .... Col_N_Criteria_N
     '''
     
-    onlyfiles = [f for f in listdir(path) if isfile(join(path, f)) and f.endswith('.tsv') or f.endswith('.csv') or f.endswith('.xlsx')]
+    onlyfiles = [f for f in listdir(path) if isfile(join(path, f)) and \
+                 f.endswith('.tsv') or f.endswith('.csv') or f.endswith('.xlsx')]
     
     return(onlyfiles)
-
-
 
 def Text_File_Selector(path):
     '''
     Input: Path to a given folder/repository
-    Output: Returns a list of files in the provided directory that end in .txt, .doc, or .docx.
+    Output: Returns a list of files in the provided directory that end in 
+        .txt, .doc, or .docx.
     
     Purpose: This allows testing data to be read in from one or multuiple files.
              
     '''
     
-    onlyfiles = [f for f in listdir(path) if isfile(join(path, f)) and f.endswith('.txt') or f.endswith('.doc') or f.endswith('.docx')]
+    onlyfiles = [f for f in listdir(path) if isfile(join(path, f)) and \
+                 f.endswith('.txt') or f.endswith('.doc') or f.endswith('.docx')]
     
     return(onlyfiles)
-
-
 
 def Image_File_Selector(path):
     '''
     Input: Path to a given folder/repository
-    Output: Returns a list of files in the provided directory that end in .txt, .doc, or .docx.
+    Output: Returns a list of files in the provided directory that end in 
+        .txt, .doc, or .docx.
     
     Purpose: This allows testing data to be read in from one or multuiple files.
              
     '''
     
-    onlyfiles = [f for f in listdir(path) if isfile(join(path, f)) and f.endswith('.jpg') or f.endswith('.jpeg') or f.endswith('.png')]
+    onlyfiles = [f for f in listdir(path) if isfile(join(path, f)) and \
+                 f.endswith('.jpg') or f.endswith('.jpeg') or f.endswith('.png')]
     
     return(onlyfiles)
-
-
 
 def Docx_File_Selector(path):
     '''
     Input: Path to a given folder/repository
-    Output: Returns a list of files in the provided directory that end in .txt, .doc, or .docx.
+    Output: Returns a list of files in the provided directory that end in \
+        .txt, .doc, or .docx.
     
     Purpose: This allows testing data to be read in from one or multuiple files.
              
     '''
     
-    onlyfiles = [f for f in listdir(path) if isfile(join(path, f)) and f.endswith('.docx')]
+    onlyfiles = [f for f in listdir(path) if isfile(join(path, f)) \
+                 and f.endswith('.docx')]
     
     return(onlyfiles)
 
@@ -91,10 +108,13 @@ def Extract_Docx_Images_Only(doc_folder_path, file_name, image_folder_path):
             
     Output: This function returns the following output:
         
-            1. Images from the selected document are placed in the target folder (JPEGs only) with coresponding title and image number
-            2. A list is returned of the image titles that have been extracted and stored from the given document
+            1. Images from the selected document are placed in the target folder 
+                (JPEGs only) with coresponding title and image number
+            2. A list is returned of the image titles that have been extracted 
+                and stored from the given document
         
-    Purpose: To assist with the preprocessing of documents by storing pictures for future analysis (perceptual hashing)
+    Purpose: To assist with the preprocessing of documents by storing pictures 
+        for future analysis (perceptual hashing)
     '''
     # Concantenate strings to form full file path
     file_path = str(doc_folder_path)+"\\"+str(file_name)
@@ -130,12 +150,13 @@ def Extract_Docx_Images_Only(doc_folder_path, file_name, image_folder_path):
 
 def xml2text(xml):
     """
-    Input: XML object
-    Output: String representation of that XML
-    
     Purpose: A string representing the textual content of this run, with content
     child elements like ``<w:tab/>`` translated to their Python
     equivalent.
+    
+    Input: XML object
+    
+    Output: String representation of that XML
     
     Source:  https://github.com/ankushshah89/python-docx2txt/blob/master/docx2txt/
     """
@@ -156,9 +177,6 @@ def xml2text(xml):
 
 def qn(tag):
     """
-    Input: 
-    Output: 
-    
     Purpose: Stands for 'qualified name', a utility function to turn a namespace
     prefixed tag name into a Clark-notation qualified tag name for lxml. For
     example, ``qn('p:cSld')`` returns ``'{http://schemas.../main}cSld'``.
@@ -171,14 +189,37 @@ def qn(tag):
 
     
 def Extract_Docx_Features(doc_folder_path, file_name, img_dir):
-    """
-    Input: 
-    Output: 
-    
-    Purpose: 
+    '''
+    Purpose: This function extracts out features contained within a Microsoft 
+                Word (docx) document.
+             This function identifies and extracts headers, footers, body text 
+                 and images from the document separately.
+             All text items are extracted and concatenated together.
+             All images are extracted and saved to the specified directory for 
+                 further analysis.
+             A dictionary is returned with 1) the document name, 2) the 
+                document text, and 3) the images found within the document
+            
+    Input: This function requires the following inputs:
+        
+        1) doc_folder_path = the file path to the folder that contains the 
+            document you are interested in extracting features from
+        2) file_name = the name of the file that you would like to extact 
+            features from  (be sure to include ".docx" at the end)
+        3) image_dir = this is the file path to the folder that any 
+            images from the file will be deposited into
+
+    Output: This function returns a dictionary with the following fields:
+        
+        1) file_name = the name of the file text and images were extracted from
+        2) text = the text contained within that file (with text in headers and 
+             footers concatenated with body text)
+        3) image_list = the titles of all the images extracted from the source 
+            file that have been deposited in the specified image_dir folder
     
     Adapted from: https://github.com/ankushshah89/python-docx2txt/blob/master/docx2txt/
-    """
+    '''
+
     file_path = str(doc_folder_path)+"\\"+str(file_name)
     
     text = u''
@@ -212,30 +253,49 @@ def Extract_Docx_Features(doc_folder_path, file_name, img_dir):
         for fname in filelist:
             _, extension = os.path.splitext(fname)
             if extension in [".jpg", ".jpeg", ".png", ".bmp"]:
-                dst_fname = os.path.join(img_dir, str(file_name)[:-5]+"_"+os.path.basename(fname))
+                dst_fname = os.path.join(img_dir, str(
+                        file_name)[:-5]+"_"+os.path.basename(fname))
                 with open(dst_fname, "wb") as dst_f:
                     dst_f.write(zipf.read(fname))
-                    image_list.append(str(file_name)[:-5]+"_"+os.path.basename(fname))
+                    image_list.append(
+                            str(file_name)[:-5]+"_"+os.path.basename(fname))
                     try:
                         image_hash_list.append(gis.generate_signature(dst_fname))
                     except:
-                        print("Could not develop an image signature for "+str(dst_fname))
+                        print("Could not develop an image signature for "
+                              + str(dst_fname))
                         pass
 
     zipf.close()
-    return({'file_name':file_name, 'text':text.strip(), 'image_list':image_list, 'image_hash_list':image_hash_list})
+    return({'file_name':file_name, 'text':text.strip(), \
+            'image_list':image_list, 'image_hash_list':image_hash_list})
 
 
 def Ingest_Training_Data(doc_folder_path, img_dir):
     '''
-    Input: 
-    Output: 
+    Purpose: This function uses the Extract_Docx_Features function to extract 
+        text and images from all .docx documents contained in a specified 
+        folder for further analysis
     
-    Purpose: 
+    Input: This function requires the following inputs:
+        1) doc_folder_path = the file path to the folder that contains the 
+            document you are interested in extracting features from
+        2) image_dir = this is the file path to the folder that any images from 
+            the file will be deposited into
+
+    Output: This function returns a pandas DataFrame with the following columns:
+        1) Doc_Title = the name of the files the coresponding text and images 
+            were extracted from
+        2) Doc_Text = the text contained within those files (with text in 
+             headers and footers concatenated with body text for each file)
+        3) Doc_Images = the titles of all the images extracted from the source 
+            files that have been deposited in the specified image_dir folder
+
     '''
     
     # Initalize a dataframe to hold results
-    Training_Data = pd.DataFrame(columns=['Doc_Title','Doc_Text','Doc_Images','Doc_Hashes'])
+    Training_Data = pd.DataFrame(
+            columns=['Doc_Title','Doc_Text','Doc_Images','Doc_Hashes'])
     
     # Retrive all .docx files from the provided folder
     Docx_list = Docx_File_Selector(doc_folder_path)
@@ -244,9 +304,17 @@ def Ingest_Training_Data(doc_folder_path, img_dir):
     for d in Docx_list:
         try:
             temp_df = Extract_Docx_Features(doc_folder_path, d, img_dir)
-            Training_Data = Training_Data.append({'Doc_Title':temp_df['file_name'], 'Doc_Text':temp_df['text'],'Doc_Images':temp_df['image_list'], 'Doc_Hashes':temp_df['image_hash_list']}, ignore_index=True)
+            Training_Data = Training_Data.append(
+                    {'Doc_Title':temp_df['file_name'], \
+                     'Doc_Text':temp_df['text'], \
+                     'Doc_Images':temp_df['image_list'], \
+                     'Doc_Hashes':temp_df['image_hash_list']}, ignore_index=True)
         except:
-            print("Error importing "+str(d)+" - File may 1) Be open in another program, 2) Not a true .docx file, 3) a temporary file or 4) corrupted.")
+            print("Error importing "+ str(d) + (
+                    ". '\n'File may be: '\n'1. Open in another program, " +
+                    "'\n'2. Not a true .docx file, '\n'3. A temporary file or " +
+                    "'\n'4. Corrupted. '\n'Alternatively, you may not have your " +
+                    "source and target directories/paths correctly specified."))
             pass
 
     # Return the a data frame with the final features

@@ -1,44 +1,34 @@
+#!/usr/bin/env python3.6
 # -*- coding: utf-8 -*-
 """
-Created on Sat Jun  9 01:10:33 2018
+:DESCRIPTION:
+    In this file we define the functions that are required to perform document 
+    similarity with SentNet using a Doc2Vec model implimented in Gensim.
 
-@author: GTayl
+    In comparison to the document matching functionality within SentNet, 
+    this set of functions attempts to estimate a score for a given document 
+    based on generalized features about that document.
+
+    This differs from document matching in that this estimate uses inputs from 
+    the entire corpus of training documents as opposed to simply finding the 
+    most "similar" document in the corpus (and assuming that "similar" provides 
+    us the correct score).
+
+:REQUIRES:
+    NONE
+    
+:TODO:
+    NONE
 """
-
-# =============================================================================
-# Overview
-# =============================================================================
-'''
-In this file we define the functions that are required to perform document 
-similarity with SentNet using a Doc2Vec model implimented in Gensim.
-
-In comparison to the document matching functionality within SentNet, 
-this set of functions attempts to estimate a score for a given document 
-based on generalized features about that document.
-
-This differs from document matching in that this estimate uses inputs from the 
-entire corpus of training documents as opposed to simply finding the most 
-"similar" document in the corpus (and assuming that "similar" provides us the 
-correct score).
-'''
-
-# =============================================================================
-# Document Similarity Set-up
-# =============================================================================
-
-# Import the required packages
+#==============================================================================
+# Package Import
+#==============================================================================
 import gensim
-import os
-import collections
-import smart_open
-import random
 import pandas as pd
 
-# =============================================================================
-# Document Similarity Functions 
-# =============================================================================
-
-
+#==============================================================================
+# Function Definitions / Reference Variable Declaration
+#==============================================================================
 # Define the function to tokenize and tag documents required for Gensim
 def read_corpus_sim(data, field, target, tokens_only=False):
     '''

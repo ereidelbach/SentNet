@@ -1,32 +1,32 @@
+#!/usr/bin/env python3.6
 # -*- coding: utf-8 -*-
 """
-Created on Sat Jun  9 01:09:24 2018
+:DESCRIPTION:
+     In this script we define all the functions that are required to perform 
+     document clustering using both words and synsets
 
-@author: GTayl
+:REQUIRES:
+    NONE
+    
+:TODO:
+    NONE
 """
-
-# =============================================================================
-# Overview 
-# =============================================================================
-
-'''
-In this document we define all the functions that are required to perform 
-document clustering using both words and synsets
-'''
 
 # =============================================================================
 # Document Clustering Set-up
 # =============================================================================
-
-# import the required packages
 import networkx as nx
-import matplotlib.pyplot as plt
+import pandas as pd
 
 try:
     from community import best_partition
-
 except:
-    print("To import the community package you must first pip install python-louvain")
+    print("To import the community package you must first: " +
+          "`pip install python-louvain`")
+    
+# import functions from other python files
+from Data_Preprocessing.SentNet_Data_Feature_Extraction \
+import clean_words, synset_translated_list
 
 # =============================================================================
 # Word Based Clustering
@@ -144,7 +144,8 @@ def Cluster_Concentrations(data, doc, partition_list):
     cluster_features = pd.DataFrame()
     
     # Define the number of clusters
-    cluster_list = partition_list.drop_duplicates(subset=['Cluster_ID'], keep='first')
+    cluster_list = partition_list.drop_duplicates(
+            subset=['Cluster_ID'], keep='first')
     num_clusters = list(cluster_list['Cluster_ID'])
     
     for c in num_clusters:
@@ -276,7 +277,8 @@ def Synset_Concentrations(data, doc, partition_list):
     cluster_features = pd.DataFrame()
     
     # Define the number of clusters
-    cluster_list = partition_list.drop_duplicates(subset=['Cluster_ID'], keep='first')
+    cluster_list = partition_list.drop_duplicates(
+            subset=['Cluster_ID'], keep='first')
     num_clusters = list(cluster_list['Cluster_ID'])
     
     for c in num_clusters:

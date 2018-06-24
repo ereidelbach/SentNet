@@ -1,18 +1,22 @@
+#!/usr/bin/env python3.6
 # -*- coding: utf-8 -*-
 """
-Created on Tue Jun 12 22:56:51 2018
+:DESCRIPTION:
+    This script is responsible for managing the development of an entire
+    scorecard (model) given a new dataset. 
 
-@author: GTayl
+:REQUIRES:
+    NONE
+    
+:TODO:
+    NONE
 """
 
-###############################################################################
+#==============================================================================
 # Package Import
-###############################################################################
-
-# Read in the required packages
+#==============================================================================
 import pickle
 import datetime
-import math
 import numpy as np
 import os
 from pathlib import Path
@@ -39,9 +43,9 @@ Document_Matching_Training, Document_Matching_Testing
 from Data_Modeling.SentNet_Document_Similarity import \
 Document_Similarity_Training, Document_Similarity_Testing
 
-###############################################################################
+#==============================================================================
 # Data Ingest 
-###############################################################################
+#==============================================================================
 
 # Establish the project root directory
 path_project_root = Path('SentNet_Training_Master.py').resolve().parent
@@ -91,17 +95,17 @@ data = data[data['essay_set']==1]
 print("Done Data Ingest")
 '''
 
-###############################################################################
+#==============================================================================
 # Train and Test Split
-###############################################################################
+#==============================================================================
 
 train, test = train_test_split(data, test_size=0.2)
 train.reset_index(drop=True, inplace=True)
 test.reset_index(drop=True, inplace=True)
 
-###############################################################################
+#==============================================================================
 # Feature Extraction 
-###############################################################################
+#==============================================================================
 
 # Define the minimum threshold (the number of documents a feature must appear 
 #   in) for a feature to be included in our analysis
@@ -158,12 +162,12 @@ synset_cluster_features = Synset_Concentrations(train, doc, synset_clusters)
 
 # Image Hashing
 Image_Hashes = Unpack_Image_Hashes(train, 'Doc_Hashes', target)
-train['Image_Avg_Score']= train.apply(lambda row: Return_Image_Score(row, 'Doc_Hashes', Image_Hashes), axis=1)
+train['Image_Avg_Score']= train.apply(lambda row: Return_Image_Score
+     (row, 'Doc_Hashes', Image_Hashes), axis=1)
 
-
-###############################################################################
+#==============================================================================
 # Modeling 
-###############################################################################
+#==============================================================================
 
 # Merge feature space to create training dataset
 train_data = pd.concat([readability_features, 
@@ -213,9 +217,9 @@ print("TRAINING")
 print(pred_crosstab)
 print(" ")
 
-###############################################################################
+#==============================================================================
 # Scoring 
-###############################################################################
+#==============================================================================
 
 # Calculate readability features for each document
 readability_features_score = Readability_Features(test, doc)
@@ -261,7 +265,8 @@ synset_centrality_features_score = Synset_Centrality_Features(
 synset_cluster_features_score = Synset_Concentrations(test, doc, synset_clusters)
 
 # Image Hashing
-test['Image_Avg_Score']= test.apply(lambda row: Return_Image_Score(row, 'Doc_Hashes', Image_Hashes), axis=1)
+test['Image_Avg_Score']= test.apply(
+        lambda row: Return_Image_Score(row, 'Doc_Hashes', Image_Hashes), axis=1)
 
 # Preparing dataset for predictions
 test_data = pd.concat([readability_features_score, 
@@ -293,9 +298,9 @@ for i in train_test_diff:
 preds = rfc.predict(test_data[modeling_features])
 preds = pd.DataFrame(preds)
 
-###############################################################################
+#==============================================================================
 # Saving Results 
-###############################################################################
+#==============================================================================
 '''
 In a production system, depending on your exisisting data management systems/
 processes you could dump these results to a database or other location. As
@@ -315,9 +320,9 @@ if os.path.isdir(dir_path) == False:
 preds.to_csv(Path(dir_path,file_name))
 
 
-###############################################################################
+#==============================================================================
 # Saving Models & Modeling Features
-###############################################################################
+#==============================================================================
 '''
 While it would be beneficial to frequently retrain the random forest models as 
 new scored docuemnts become available, we forsee the need to score additional

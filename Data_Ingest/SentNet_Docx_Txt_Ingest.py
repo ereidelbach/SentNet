@@ -1,10 +1,6 @@
 #!/usr/bin/env python3.6
 # -*- coding: utf-8 -*-
 """
-Created on Sun Jun 10 16:29:34 2018
-
-@author: Eric Reidelbach
-
 :DESCRIPTION:
     - This script will ingest individual .docx files and .txt files and store
         them in a dataframe that matches the original format of the training
