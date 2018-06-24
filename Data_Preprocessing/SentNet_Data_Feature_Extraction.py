@@ -176,8 +176,8 @@ def clean_sentence(text):
 #==============================================================================
 '''
 In this section, we define the function used to run and extract various 
-"readability" metrics for every document. These features will be the second 
-input into our classification models.
+"readability" metrics for every document. These features will serve as inputs 
+into our classification model.
 '''
 
 # Create a copy of our original data pull to append to
@@ -229,8 +229,8 @@ def Readability_Features(data, target):
 #==============================================================================    
 '''
 In this section, we define the function identify and extract all word/token 
-based features from every document. These features will be the second input 
-into our classification models.
+based features from every document. These features will serve as inputs into
+our classification model.
 '''
 
 def Word_Features(data, doc, limit):
@@ -307,8 +307,8 @@ def Word_Features(data, doc, limit):
 #==============================================================================
 '''
 In the below section, we define the functions to identify and extract all 
-sysnset based features from every document. These features will be the third 
-input into our classification models.
+sysnset based features from every document. These features will serve as inputs 
+into our classification model.
 '''
 
 ########################## Synset Translation Functions #######################
@@ -385,7 +385,7 @@ def synset_translated_string(text):
     Input: Sentence represented as a string
         
     Output: A string in which all terms have been replaced with all the synset 
-    codes along thier hypernym path, separated by spaces.
+    codes along their hypernym path, separated by spaces.
     '''
     string = ""
     temp = clean_words(text)
@@ -403,7 +403,7 @@ def synset_translated_string(text):
 def Synset_Features(data, target, limit): 
     '''
     Purpose: In this section we extract synset counts from documents to use as 
-    the third feature class for our models.
+    a feature in our classification model.
     
     Input: Pandas DataFrame with the document text stored in a column (in this 
     case 'essay')
@@ -500,8 +500,7 @@ to extract three additional feature sets:
         clusters we calculate the concentration/presence of each cluster 
         within each document.
         
-These two sets of features will be used as the fourth, fifth, and sixth 
-inputs into our classification models.
+These three sets of features will be used inputs into our classification model.
 '''
 
 ######################### Word - Edge Feature Generation Functions ############
@@ -761,13 +760,10 @@ to extract two additional feature sets:
         After identifying these clusters, we calculate the concentration/presence 
         of each cluster within each document.
         
-These two sets of features will then be used as the sixth and seventh inputs 
-into our classification models.
+These sets of features will then be used as inputs into our classification model.
 '''
    
 ######################### Synset - Edge Feature Generation Functions ##########
-
-#
 def synset_translated_sentence(text):
     '''
     Purpose: This function takes a given string and returns a list of all the 
@@ -800,7 +796,6 @@ def synset_translated_sentence(text):
             
     return(synset_list)
 
-#
 def pd_edge_extractor_synset(text):
     '''
     Purpose: This function builds a list of all the synset edge/connections 
@@ -833,11 +828,11 @@ def pd_edge_extractor_synset(text):
     for sent in sent_list:
         term_list = sorted(synset_translated_sentence(sent))
         edge_list = list(itertools.combinations(term_list, 2))
-        doc_edge_list = doc_edge_list.append(pd.DataFrame(list(edge_list),columns=['Synset_A','Synset_B']), ignore_index=True)
+        doc_edge_list = doc_edge_list.append(pd.DataFrame(list(
+                edge_list),columns=['Synset_A','Synset_B']), ignore_index=True)
         
     return(doc_edge_list)
 
-#
 def touple_edge_extractor_synset(text):
     '''
     Purpose: This function builds an edge/connections list for the document 
