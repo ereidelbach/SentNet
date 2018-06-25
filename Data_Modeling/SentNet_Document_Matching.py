@@ -58,6 +58,10 @@ def read_corpus(data, field, tokens_only=False):
             # For training data, add tags
             yield gensim.models.doc2vec.TaggedDocument(
                     gensim.utils.simple_preprocess(row[field]), [index])
+        # Status Update
+        if index%100 == 0 and index != 0:
+            print('Completed converting ' + str(index) + ' documents for ' +
+                  'Document Matching')
 
 
 # Defining the function to train and return the Gensim Model
@@ -158,7 +162,14 @@ def Doc2Vec_Estimates_Training(model, train_corpus, scores_join, target, limit=0
         estimates = estimates.append(
                 {'Doc_ID':doc_id, 'Matching_Pred_Class':pred_class, \
                  'Pred_Prob':pred_prob}, ignore_index=True)
-            
+    
+        # Status Update
+        try:
+            if train_corpus.index(doc_id)%100 == 0 and train_corpus.index(doc_id) != 0:
+                print('Completed Document Matching estimate scores for ' + 
+                      str(train_corpus.index(doc_id)) + ' documents')
+        except:
+            pass
     return(estimates)
     
     
@@ -233,12 +244,18 @@ def Doc2Vec_Estimates_Testing(model, train_corpus, scores_join, target, limit=0)
         #   document to get the average weighted class
         sims['Weighted_Class'] = sims.apply(
                 lambda row: (row[target]*row['Prob']), axis=1)
-        weighted_class = sims['Weighted_Class'].mean()
+        #weighted_class = sims['Weighted_Class'].mean()
         
         # Append the estimates to the estimates dataframe
         estimates = estimates.append(
                 {'Doc_ID':doc_id, 'Matching_Pred_Class':pred_class, \
                  'Pred_Prob':pred_prob}, ignore_index=True)
+        try:
+            if train_corpus.index(doc_id)%100 == 0 and train_corpus.index(doc_id) != 0:
+                print('Completed Document Matching estimate scores for ' + 
+                      str(train_corpus.index(doc_id)) + ' documents')
+        except:
+            pass
             
     return(estimates)
 

@@ -20,20 +20,20 @@
     - docx2txt package (https://github.com/ankushshah89/python-docx2txt)
         * install via the command: 'pip install docx2txt'
         * import library via the command:  'import docx2txt'
-    
+
 :TODO:
     - Link with Hashing functions in Data_Processing/Goldberg_Perceptual_Hashing.py
-        to process any images contained in the .docx file and then create a 
+        to process any images contained in the .docx file and then create a
         variable which contains the hashing information
 """
- 
+
 #==============================================================================
 # Package Import
 #==============================================================================
 import docx2txt
 import docx
 from pathlib import Path
-import os   
+import os
 import random
 from Data_Ingest.SentNet_Docx_Txt_Ingest import ingest_files
 
@@ -43,7 +43,7 @@ from Data_Ingest.SentNet_Docx_Txt_Ingest import ingest_files
 def insert_image_into_docx(doc_dir_path, img_dir_path):
     '''
    Description:
-       - This function will ingest every .docx file contained within the 
+       - This function will ingest every .docx file contained within the
            specified folder (i.e. `path` )and inject 0-3 images into the file.
            The number is randomly chosen.
     - There are three image types in the directory: Pie Charts, Bar Charts,
@@ -60,11 +60,11 @@ def insert_image_into_docx(doc_dir_path, img_dir_path):
         - Nothing is returned by this function
         - This function will overwrite every .docx file with a new file
             containing 0-3 images
-    '''       
+    '''
 #    folder = 'Set4'
 #    doc_dir_path = Path('Data', folder, 'docx')
-#    img_dir_path = Path('Data','Images')    
-    
+#    img_dir_path = Path('Data','Images')
+
     # setup variables for use in the function
     imageTypeDict = {'0':[],
                  '1':['PieChart'],
@@ -75,7 +75,7 @@ def insert_image_into_docx(doc_dir_path, img_dir_path):
                  '6':['BarChart','LineChart'],
                  '7':['PieChart','LineChart','BarChart'],
                  }
-    
+
     # read in the filename of each image in the image directory into a list
     image_list = []
     for fname in os.listdir(img_dir_path):
@@ -88,7 +88,7 @@ def insert_image_into_docx(doc_dir_path, img_dir_path):
         if filename.endswith('.docx'):
             file_list.append(filename)
             doc_list.append(doc_dir_path / filename)
-        
+
     # read in the contents of each file into a dataframe so that we can compute
     #   the distribution of `domain_scores`
     docDF = ingest_files(doc_dir_path)
@@ -98,20 +98,20 @@ def insert_image_into_docx(doc_dir_path, img_dir_path):
         domain_scores = sorted([int(x.split('.')[0]) for x in domain_scores])
     except:
         docDF[docDF['domain1_score']=='nan']
-        
+
     # iterate over every file in the list
     for file_name, file_path, in zip(file_list, doc_list):
         # check to see what the file's value is for `domain1_score`
         doc = docx2txt.process(file_path)
-        
+
         # split the document into a list and then extract the `domain1_score`
         doc_elements = doc.split('\n\n')
         domScore = int(doc_elements[doc_elements.index('domain1_score')+1].split('.')[0])
-        
+
         # randomly select what image types should be put in the file:
         #   0, 1, 2, or 3 of the available options:  pie, line or bar
         imageTypeList = imageTypeDict[str(random.randint(0,7))]
-        
+
         # randomly select what images should be pulled from the group based on the
         #   file's `domain1_score`
         insertedImagesList = []
@@ -123,10 +123,10 @@ def insert_image_into_docx(doc_dir_path, img_dir_path):
                 insertedImagesList.append(image + str(random.randint(3,8)) + '.png')
             else:   # upper 30%
                 insertedImagesList.append(image + str(random.randint(7,10)) + '.png')
-                      
+
         # open the specified .docx document for editing
         document = docx.Document(file_path)
-        
+
         # inject the image(s) into the file under the header(s): Image1, Image2, etc.
         for image in insertedImagesList:
             try:
@@ -136,39 +136,26 @@ def insert_image_into_docx(doc_dir_path, img_dir_path):
             heading = 'Image ' + str(insertedImagesList.index(image)+1)
             document.add_heading(heading, 2)
             document.add_picture(image_path)
-    
+
         # check to make sure an image subfolder exists in the docx folder
         # if it doesn't, make it
         if (file_path.parent / 'Images').is_dir() == False:
             os.makedirs(file_path.parent / 'Images')
-        
+
         # save the file
         document.save(file_path.parent/'Images'/file_name)
-        
+
         # keep a counter going for progress
         if file_list.index(file_name)%100 == 0:
-            print('Done with ' + str(file_list.index(file_name)) + ' files in ' 
-                  + doc_dir_path.parts[1])
-        
+            print('Done inserting images into ' + str(file_list.index(file_name)) 
+                + ' files in ' + doc_dir_path.parts[1])
+
+def inject_training_files():
+    for folder in ['Set1', 'Set2', 'Set3', 'Set4', 'Set5', 'Set6', 'Set7', 'Set8']:
+        doc_folder = Path('Data', folder, 'docx')
+        image_folder = Path('Data','Images')
+        insert_image_into_docx(doc_folder, image_folder)
+
 #==============================================================================
 # Working Code
 #==============================================================================
-
-# Set the project working directory
-os.chdir(r'E:\Projects\SentNet')
-#os.chdir(r'/home/ejreidelbach/projects/SentNet')
-
-# for every folder in the list, inject images into every .docx file
-for folder in ['Set1', 'Set2', 'Set3', 'Set4', 'Set5', 'Set6', 'Set7', 'Set8']:
-    doc_folder = Path('Data', folder, 'docx')
-    image_folder = Path('Data','Images')
-    insert_image_into_docx(doc_folder, image_folder)
-
-# Inject images into every .docx file for Set7
-#doc_folder = Path("Data/Set7/docx")
-#image_folder = Path("Data/Images")
-#insert_image_into_docx(doc_folder, image_folder)
-#
-## Inject images into every .docx file for Set8
-#doc_folder = Path("Data/Set8/docx")
-#insert_image_into_docx(doc_folder, image_folder)

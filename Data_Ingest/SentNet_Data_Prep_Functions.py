@@ -17,8 +17,9 @@
 #==============================================================================
 # Package Import
 #==============================================================================
-from goldberg import ImageSignature
+from Data_Preprocessing.Goldberg_Perceptual_Hashing import ImageSignature
 gis = ImageSignature()
+from pathlib import Path
 import os
 from os.path import isfile, join
 from os import listdir
@@ -117,7 +118,8 @@ def Extract_Docx_Images_Only(doc_folder_path, file_name, image_folder_path):
         for future analysis (perceptual hashing)
     '''
     # Concantenate strings to form full file path
-    file_path = str(doc_folder_path)+"\\"+str(file_name)
+    file_path = Path(doc_folder_path, file_name)
+   # file_path = str(doc_folder_path)+"\\"+str(file_name)
     
     # Zip the selected file to break it into it's component parts
     z = zipfile.ZipFile(file_path)
@@ -137,7 +139,8 @@ def Extract_Docx_Images_Only(doc_folder_path, file_name, image_folder_path):
         for i in images:
             n += 1
             image_name = str(file_name)[:-5]+"_image_"+str(n)+".jpeg"
-            image_file_path = image_folder_path+"\\"+image_name
+            image_file_path = Path(image_folder_path, image_name)
+            #image_file_path = image_folder_path+"\\"+image_name
             save_image = z.open(i).read()
             f = open(image_file_path,'wb')
             f.write(save_image)
@@ -221,8 +224,8 @@ def Extract_Docx_Features(doc_folder_path, file_name, img_dir):
     
     Adapted from: https://github.com/ankushshah89/python-docx2txt/blob/master/docx2txt/
     '''
-
-    file_path = str(doc_folder_path)+"\\"+str(file_name)
+    file_path = Path(doc_folder_path, file_name)
+    #file_path = str(doc_folder_path)+"\\"+str(file_name)
     
     text = u''
     image_list = []
@@ -252,7 +255,8 @@ def Extract_Docx_Features(doc_folder_path, file_name, img_dir):
 
     if img_dir is not None:
         # extract images
-        for fname in filelist:
+        for fname in [f for f in filelist if f.startswith('word/media/')]:
+#        for fname in filelist:
             _, extension = os.path.splitext(fname)
             if extension in [".jpg", ".jpeg", ".png", ".bmp"]:
                 dst_fname = os.path.join(img_dir, str(
@@ -265,7 +269,7 @@ def Extract_Docx_Features(doc_folder_path, file_name, img_dir):
                         image_hash_list.append(gis.generate_signature(dst_fname))
                     except:
                         print("Could not develop an image signature for "
-                              + str(dst_fname))
+                              + str(file_name)[:-5]+"_"+os.path.basename(fname))
                         pass
 
     zipf.close()
@@ -296,7 +300,6 @@ def Ingest_Training_Data(doc_folder_path, img_dir):
             files that have been deposited into the specified image_dir folder
 
     '''
-    
     # Initalize a dataframe to hold results
     Training_Data = pd.DataFrame(
             columns=['Doc_Title','Doc_Text','Doc_Images','Doc_Hashes'])
@@ -320,6 +323,10 @@ def Ingest_Training_Data(doc_folder_path, img_dir):
                     "'\n'4. Corrupted. '\n'Alternatively, you may not have your " +
                     "source and target directories/paths correctly specified."))
             pass
+        # Status Update
+        if Docx_list.index(d)%100==0 and Docx_list.index(d) != 0:
+            print("Complete with ingesting " + str(Docx_list.index(d)) + " files in "
+                  + str([x for x in list(doc_folder_path.parts) if 'Set' in x][0]))
 
     # Return the a data frame with the final features
     return(Training_Data)

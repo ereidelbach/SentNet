@@ -65,7 +65,7 @@ def textatistic_scores(document):
         document_dict['tt_score_gunningfog'] = s.gunningfog_score
         document_dict['tt_score_smog'] = s.smog_score
     except(ZeroDivisionError):
-        print('TEXTATISTIC -- Error with: ' + document)
+        #print('TEXTATISTIC -- Error with: ' + document)
         document_dict['tt_count_sent'] = 'N/A'
         document_dict['tt_count_sybl'] = 'N/A'
         document_dict['tt_count_word'] = 'N/A'
@@ -104,7 +104,7 @@ def textstat_scores(document):
         document_dict['ts_score_gunningfog'] = textstat.gunning_fog(document)
         document_dict['ts_score_smog'] = textstat.smog_index(document)
     except(ZeroDivisionError):
-        print('TEXTSTAT -- Error with: ' + document)
+        #print('TEXTSTAT -- Error with: ' + document)
         document_dict['ts_score_dalechall'] = 'N/A'
         document_dict['ts_score_flesch'] = 'N/A'
         document_dict['ts_score_fleschkincaid'] = 'N/A'

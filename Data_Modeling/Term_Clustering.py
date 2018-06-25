@@ -26,7 +26,7 @@ except:
     
 # import functions from other python files
 from Data_Preprocessing.SentNet_Data_Feature_Extraction \
-import clean_words, synset_translated_list
+import clean_words, synset_translated_sentence
 
 # =============================================================================
 # Word Based Clustering
@@ -246,7 +246,7 @@ def synset_cluster_concentration(string, cluster_synset_list):
                 given topic are contained within the document
     '''
     
-    doc_synsets = synset_translated_list(string)
+    doc_synsets = synset_translated_sentence(string)
     intersection = len(list(set(doc_synsets) & set(cluster_synset_list)))
     cluster_total = len(cluster_synset_list)
     cluster_concentration = intersection/cluster_total
