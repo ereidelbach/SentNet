@@ -1030,7 +1030,7 @@ documents.
 
 def Unpack_Image_Hashes(data, images, target):
     '''
-    Purpose: This function unpacks the Golderberg Perceptual Hashing Array's
+    Purpose: This function unpacks the Goldberg Perceptual Hashing Array's
     that were extract from document images during the ingest process. Given
     that more than one image can be present in a document, this function
     flattens this list of all hash arrays from all documents into a single
@@ -1094,20 +1094,20 @@ def Return_Image_Score(row, hashes, image_df):
                  
                 1) A given row from the original dataframe is provided to the
                     function
-                2) Initalized values created to calulate the final estimated
-                   score as well as copy a temporary version of the flattned
+                2) Initialized values created to calculate the final estimated
+                   score as well as copy a temporary version of the flattened
                    image hash table provided by the Unpack_Image_Hashes
                    function
                 3) For every image hash extracted from that provided document
-                   we calulate the similarity between that image hash and all 
-                   other image hashes contained within the flattned image 
+                   we calculate the similarity between that image hash and all 
+                   other image hashes contained within the flattened image 
                    hash table and append the "match probability" to our
                    temporary dataframe
-                4) We then sort that dataframe by the match porbability and 
+                4) We then sort that dataframe by the match probability and 
                    remove any matches that are less than .75 (not likely to be
                    a matching/similar image)
                 5) We take the mean of the target scores for all of the 
-                   remaining "high likelyhood" matches/similarities
+                   remaining "high likelihood" matches/similarities
         
     Input: This function requires the following inputs:
             

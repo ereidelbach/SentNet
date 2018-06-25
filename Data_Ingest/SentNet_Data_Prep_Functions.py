@@ -216,6 +216,8 @@ def Extract_Docx_Features(doc_folder_path, file_name, img_dir):
              footers concatenated with body text)
         3) image_list = the titles of all the images extracted from the source 
             file that have been deposited in the specified image_dir folder
+        4) image_hash_list = the hash of all images extracted from the source
+            file that have been deposited in the specified img_dir folder
     
     Adapted from: https://github.com/ankushshah89/python-docx2txt/blob/master/docx2txt/
     '''
@@ -290,6 +292,8 @@ def Ingest_Training_Data(doc_folder_path, img_dir):
              headers and footers concatenated with body text for each file)
         3) Doc_Images = the titles of all the images extracted from the source 
             files that have been deposited in the specified image_dir folder
+        4) Doch Hashes = the hashes of all images extracted from the source
+            files that have been deposited into the specified image_dir folder
 
     '''
     

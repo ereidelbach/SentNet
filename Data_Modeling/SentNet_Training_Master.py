@@ -309,7 +309,7 @@ excel worksheet.
 '''
 # create a date value for use in the model results file name
 date = str(datetime.datetime.now().isoformat(sep='_',timespec='seconds'))
-file_name = ("SentNet_Scoring_Predictions_"+date+".xlsx")
+file_name = ("SentNet_Scoring_Predictions_" + date + ".xlsx")
 
 # check to make sure a folder exists for exporting the data in the desired path
 dir_path = Path(path_project_root,'Model_Results')
@@ -339,16 +339,16 @@ if os.path.isdir(dir_path) == False:
     os.makedirs(dir_path)
 
 # Saving the feature set
-file_name = "SentNet_Modeling_Feature_Set_"+date+".csv"
+file_name = "SentNet_Modeling_Feature_Set_" + date + ".csv"
 feature_set_file_name = (Path(dir_path,file_name))
 modeling_features.to_csv(feature_set_file_name)
 
 #Saving the Image Hashes
-image_hash_set_file_name = ("SentNet_Modeling_Image_Hash_Set_"+date+".csv")
+image_hash_set_file_name = ("SentNet_Modeling_Image_Hash_Set_" + date + ".csv")
 Image_Hashes.to_csv(feature_set_file_name)
 
 # Saving the random forest model
-model_file_name = ("SentNet_Model_"+date+".pkl")
+model_file_name = ("SentNet_Model_" + date + ".pkl")
 model_save_path = str(Path(dir_path,model_file_name))
 with open(model_save_path, 'wb') as f:
     pickle.dump(rfc, f)
