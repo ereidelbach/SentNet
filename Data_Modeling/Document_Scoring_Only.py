@@ -27,7 +27,6 @@ import numpy as np
 from pathlib import Path
 import pandas as pd
 import pickle
-from sklearn.ensemble import RandomForestClassifier
 
 # import functions from other python files
 from Data_Ingest.SentNet_Data_Prep_Functions import Ingest_Training_Data
@@ -36,21 +35,23 @@ from Data_Preprocessing.SentNet_Data_Feature_Extraction import Word_Features, \
 Word_Edge_Features, Word_Centrality_Features, Synset_Features, \
 Synset_Edge_Features, Synset_Centrality_Features, Readability_Features
 
-from Data_Modeling.Term_Clustering import Clustering_Features, \
-Cluster_Concentrations, Synset_Clustering_Features, Synset_Concentrations
+from Data_Modeling.Term_Clustering import Cluster_Concentrations, Synset_Concentrations
 
-from Data_Modeling.SentNet_Document_Matching import \
-Document_Matching_Training, Document_Matching_Testing
+from Data_Modeling.SentNet_Document_Matching import Document_Matching_Testing
 
-from Data_Modeling.SentNet_Document_Similarity import \
-Document_Similarity_Training, Document_Similarity_Testing
+from Data_Modeling.SentNet_Document_Similarity import Document_Similarity_Testing
 
 #==============================================================================
 # Data Ingest 
 #==============================================================================
 
-################################## .Docx Data Ingest ##########################
+# Establish the project root directory
+path_project_root = Path('SentNet_Training_Master.py').resolve().parent
 
+# Specify the data folder that we want to model
+data_set = 'Set1'
+
+################################## .Docx Data Ingest ##########################
 # This assumes the Scoring Data is in the path: SentNet\Data\Set1\docx\Images
 path_data = Path('Data','Set1','docx','Images')
 # It will place your image files in: SentNet\Data\Set1\docx\Images\Unpacked
@@ -80,7 +81,6 @@ for index, row in data_raw.iterrows():
 # turn the list of dictionaries into a new dataframe with all the the info
 #   necessary to proceed with analysis and modeling
 score = pd.DataFrame(temp_list)
-
 
 '''
 ############################### Spreadsheet Data Ingest #######################

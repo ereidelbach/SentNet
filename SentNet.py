@@ -67,4 +67,4 @@ NOTE: The Document Matching and Document Similarity functions can take several
 minutes to run.  In total, the model building process will average roughly 
 30 minutes for a typical set folder.
 '''
-model_training_files(data_set)
+#model_training_files(data_set)
