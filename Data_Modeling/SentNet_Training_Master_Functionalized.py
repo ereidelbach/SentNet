@@ -42,9 +42,29 @@ from Data_Modeling.SentNet_Document_Similarity import \
 Document_Similarity_Training, Document_Similarity_Testing
 
 def model_training_files(data_set):
-    #===========================================================================
+    '''
+    Purpose: This funciton replicates the entire contents of the
+        SentNet_Training_Master.py Python Script and allows a user to simply
+        specify the desired dataset file path to be trained/scored rather
+        than having to edit the file each time a new dataset is to ingested
+        and evaluated. Instead, a user can simply call this function and provide
+        the dataset name as an input.
+    
+    Input: This function requires the following inputs:
+        1) data_set = name of the folder that contains the 
+            document you are interested in extracting features from
+            ** file path will be constructed by the function, as seen below in
+                the variable `path_data`
+
+    Output: 
+        1) A fully trained/scored model with results saved to the `Model_Results`
+            folder and model features and the model pickle file saved to the
+            `Model_Files` folder
+    
+    '''
+    #==========================================================================
     # Data Ingest
-    #===========================================================================
+    #==========================================================================
     # Establish the project root directory
     path_project_root = Path('SentNet_Training_Master_Functionalized.py').resolve().parent
 
@@ -67,8 +87,8 @@ def model_training_files(data_set):
         doc_elements = [x for x in doc_elements if x != '']
         # remove any rows that are similar to 'Image 1', 'Image 2', etc...
         doc_elements = [x for x in doc_elements if 'Image ' not in x]
-        # create a dictionary where the key is the variable name and the value is
-        #   score/text from the document
+        # create a dictionary where the key is the variable name and the value 
+        #   is score/text from the document
         doc_dict = {}
         for (key, value) in zip(doc_elements[::2], doc_elements[1::2]):
             doc_dict[key] = value
@@ -82,20 +102,22 @@ def model_training_files(data_set):
     #   necessary to proceed with analysis and modeling
     data = pd.DataFrame(temp_list)
 
-    #===========================================================================
+    #==========================================================================
     # Train and Test Split
-    #===========================================================================
+    #==========================================================================
 
     train, test = train_test_split(data, test_size=0.2)
     train.reset_index(drop=True, inplace=True)
     test.reset_index(drop=True, inplace=True)
 
-    #===========================================================================
+    #==========================================================================
     # Feature Extraction
-    #===========================================================================
+    #==========================================================================
+    # silence verbose Pandas Copy Notices
+    pd.options.mode.chained_assignment = None  # default='warn'
 
-    # Define the minimum threshold (the number of documents a feature must appear
-    #   in) for a feature to be included in our analysis
+    # Define the minimum threshold (the number of documents a feature must 
+    #   appear in) for a feature to be included in our analysis
     limit = round(0.02*len(train))
     target = 'domain1_score'
     doc = 'essay'
@@ -152,9 +174,9 @@ def model_training_files(data_set):
     train['Image_Avg_Score']= train.apply(lambda row: Return_Image_Score
          (row, 'Doc_Hashes', Image_Hashes), axis=1)
 
-    #===========================================================================
+    #==========================================================================
     # Modeling
-    #===========================================================================
+    #==========================================================================
 
     # Merge feature space to create training dataset
     train_data = pd.concat([readability_features,
@@ -204,9 +226,9 @@ def model_training_files(data_set):
     print(pred_crosstab)
     print(" ")
 
-    #===========================================================================
+    #==========================================================================
     # Scoring
-    #===========================================================================
+    #==========================================================================
 
     # Calculate readability features for each document
     readability_features_score = Readability_Features(test, doc)
@@ -285,56 +307,60 @@ def model_training_files(data_set):
     preds = rfc.predict(test_data[modeling_features])
     preds = pd.DataFrame(preds)
 
-    #===========================================================================
+    #==========================================================================
     # Saving Results
-    #===========================================================================
+    #==========================================================================
     '''
-    In a production system, depending on your exisisting data management systems/
-    processes you could dump these results to a database or other location. As
-    a temporary standin for a finalized solution, we write our results to an
-    excel worksheet.
+    In a production system, depending on your exisisting data management 
+    systems/processes you could dump these results to a database or other 
+    location. As a temporary standin for a finalized solution, we write our 
+    results to an excel worksheet.
     '''
     # create a date value for use in the model results file name
     date = str(datetime.datetime.now().isoformat(sep='_',timespec='seconds'))
-    file_name = ("SentNet_Scoring_Predictions_" + date + ".xlsx")
+    model_results_file_name = ("SentNet_Scoring_Predictions_" + date + ".xlsx")
 
-    # check to make sure a folder exists for exporting the data in the desired path
+    # check to make sure a folder exists for exporting the data 
     dir_path = Path(path_project_root,'Model_Results')
     if os.path.isdir(dir_path) == False:
         os.makedirs(dir_path)
 
     # export the model results
-    preds.to_csv(Path(dir_path,file_name))
+    preds.to_csv(Path(dir_path, model_results_file_name))
 
-    #===========================================================================
+    #==========================================================================
     # Saving Models & Modeling Features
-    #===========================================================================
+    #==========================================================================
     '''
     While it would be beneficial to frequently retrain the random forest models
     as new scored docuemnts become available, we forsee the need to score
     additional documents without retraining the model first. When this is the
-    case, it would be more effecitve to simply import the already trained models
-    (if your previous sesssion ended or shutdown) and simply run new observations
-    through those models (as opposed to having to retrain the models from
-    scratch). When this is the case we must export our final models and feature
-    set so they can be imported later. To accomplish this we do the following:
+    case, it would be more effecitve to simply import the already trained 
+    models (if your previous sesssion ended or shutdown) and simply run new 
+    observations through those models (as opposed to having to retrain the 
+    models from scratch). When this is the case we must export our final models 
+    and feature set so they can be imported later. To accomplish this we do the 
+    following:
     '''
-    # check to make sure a folder exists for exporting the data in the desired path
+    # check to make sure a folder exists for exporting the data 
     dir_path = Path(path_project_root,'Model_Files')
     if os.path.isdir(dir_path) == False:
         os.makedirs(dir_path)
 
     # Saving the feature set
-    file_name = "SentNet_Modeling_Feature_Set_" + date + ".csv"
-    feature_set_file_name = (Path(dir_path,file_name))
-    modeling_features.to_csv(feature_set_file_name)
+    feature_set_file_name = "SentNet_Modeling_Feature_Set_" + date + ".csv"
+    feature_set_save_path = (Path(dir_path, feature_set_file_name))
+    modeling_features_df = pd.DataFrame(modeling_features)
+    modeling_features_df.to_csv(feature_set_save_path)
 
     #Saving the Image Hashes
-    image_hash_set_file_name = ("SentNet_Modeling_Image_Hash_Set_" + date + ".csv")
-    Image_Hashes.to_csv(feature_set_file_name)
+    image_hash_set_file_name = (
+            "SentNet_Modeling_Image_Hash_Set_" + date + ".csv")
+    image_hash_save_path = Path(dir_path, image_hash_set_file_name)
+    Image_Hashes.to_csv(image_hash_save_path)
 
     # Saving the random forest model
     model_file_name = ("SentNet_Model_" + date + ".pkl")
-    model_save_path = str(Path(dir_path,model_file_name))
+    model_save_path = Path(dir_path, model_file_name)
     with open(model_save_path, 'wb') as f:
         pickle.dump(rfc, f)

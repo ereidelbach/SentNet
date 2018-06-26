@@ -21,8 +21,8 @@
 #==============================================================================
 # install via (conda install scikit-image or pip install scikit-image)
 from skimage.color import rgb2gray
-#from skimage.io import imread
-from imageio import imread
+from skimage.io import imread
+#from imageio import imread
 from PIL import Image
 from PIL.MpoImagePlugin import MpoImageFile
 try:
@@ -173,7 +173,6 @@ class ImageSignature(object):
                     0,  0,  0,  1,  0,  1, -1,  1,  0,  0,  0, -1,  0,  0, -1,  0,  0,
                     0,  0], dtype=int8)
         """
-
         # Step 1:    Load image as array of grey-levels
         im_array = self.preprocess_image(path_or_image, handle_mpo=self.handle_mpo, bytestream=bytestream)
 

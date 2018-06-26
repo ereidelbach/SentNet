@@ -200,7 +200,7 @@ def Readability_Features(data, target):
         if index%100 == 0 and index != 0:
             print('Completed readability for: ' + str(index) + ' documents')
 
-    print("Done Readability Tests")
+    print("Completed Readability Tests")
     return(doc_readability_features)
 
 
@@ -277,7 +277,7 @@ def Word_Features(data, doc, limit):
     selected_words = selected_words.index
     word_matrix_features = count_matrix[selected_words]
 
-    print("Done Word Features")
+    print("Completed Word Feature Generation")
 
     return({'word_matrix_features':word_matrix_features, \
             'selected_words':selected_words})
@@ -439,7 +439,7 @@ def Synset_Features(data, target, limit):
     selected_synsets = selected_synsets.index
     synset_matrix_features = count_matrix_syn[selected_synsets]
 
-    print("Done Synset Generation")
+    print("Completed Synset Generation")
     return({"synset_matrix_features":synset_matrix_features, \
             "selected_synsets":selected_synsets})
 
@@ -636,7 +636,7 @@ def Word_Edge_Features(data, target, limit):
     edges_matrix_features = pd.DataFrame(
             count_matrix_edges.todense(), columns=selected_edge_list)
 
-    print('Done with Word Edge Features')
+    print('Complete with Word Edge Feature Extraction')
     return({'edges_matrix_features':edges_matrix_features, \
             'master_edge_list':master_edge_list})
 
@@ -700,7 +700,7 @@ def Word_Centrality_Features(data, doc, selected_words):
                 temp_dict,ignore_index=True)
 
     # Return the final word_centrality DataFrame
-    print("Done Word Graph Generation")
+    print("Completed Word Graph Generation")
     return(word_centrality_matrix)
 
 
@@ -934,7 +934,7 @@ def Synset_Edge_Features(data, target, limit):
     edges_matrix_features_synset = pd.DataFrame(
             count_matrix_edges_synset.todense(), columns=selected_edge_list_synset)
 
-    print("Done with Synset_Edge_Features")
+    print("Completed Synset Edge Feature Generation")
     return({'edges_matrix_features_synset':edges_matrix_features_synset, \
             'master_edge_list_synset':master_edge_list_synset})
 
@@ -994,7 +994,7 @@ def Synset_Centrality_Features(data, doc, selected_synsets):
         synset_centrality_matrix = synset_centrality_matrix.append(
                 temp_dict,ignore_index=True)
 
-    print("Done Synset Graph Generation")
+    print("Completed Synset Graph Generation")
     return(synset_centrality_matrix)
 
 ###############################################################################
