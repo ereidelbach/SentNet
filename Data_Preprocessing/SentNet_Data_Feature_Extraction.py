@@ -11,7 +11,7 @@
     2. word_matrix_features
         - Word counts for the most common/important words within each document
     3. synset_matrix_features
-        - The prevelence of the most common/important synsets (a WordNet
+        - The prevalence of the most common/important synsets (a WordNet
             lexigraphic representation of words) contained within each document
     4. edges_matrix_features
         - Counts of the most common/important co-occuring terms within
@@ -87,7 +87,7 @@ sent_tokenize = nltk.tokenize.punkt.PunktSentenceTokenizer()
 #==============================================================================
 '''
 In this section we define functions that will be used to clean/transform
-documents so they can be injested by the later feature generation functions.
+documents so they can be ingested by the later feature generation functions.
 '''
 
 # Prep text
@@ -97,7 +97,7 @@ def remove_punc(text):
     Punctuation symbols to be removed are defined in the above set-up section.
 
     Input: text (string)
-    Output: text_cleaned (string with puctuation symbols removed)
+    Output: text_cleaned (string with punctuation symbols removed)
 
     '''
     text_cleaned = ""
@@ -133,7 +133,7 @@ def clean_sentence(text):
     marks and stop words removed.
 
     Input: text (string)
-    Output: string (string with puctuation marks and stop words removed)
+    Output: string (string with punctuation marks and stop words removed)
 
     '''
     string = ""
@@ -172,7 +172,7 @@ def Readability_Features(data, target):
                         the original text for each document
 
     Output: doc_readability_features - a pandas dataframe that contains
-              readability metriccs from the Textatistic and Textstate Python
+              readability metrics from the Textatistic and Textstate Python
               libraries
 
     '''
@@ -218,7 +218,7 @@ def Word_Features(data, doc, limit):
     Purpose: In this function we first clean a document (removing punctuation,
              stopword, etc). Next, we extract the unique words from all
              documents. We then select the subset of terms that occur more than
-             the user defined threashold. Next we obtain a feature vector for
+             the user defined threshold. Next we obtain a feature vector for
              each term that holds the number of times that term was observed in
              each document. These feature vectors are then appended into a
              pandas DataFrame for further analysis.
@@ -233,8 +233,8 @@ def Word_Features(data, doc, limit):
                          sufficiently rare that they do not add any predictive
                          value. A limit parameter of 0.01 means that a word must
                          appear in at least 1% of documents to be included in
-                         the term matrix. This helps to remove extreamly rare
-                         features (as well as mispellings) that will provide
+                         the term matrix. This helps to remove extremely rare
+                         features (as well as misspellings) that will provide
                          little value during the modeling process.
 
     Output: A dense document (n) by word (w) (n x w) matrix that contains the
@@ -242,11 +242,11 @@ def Word_Features(data, doc, limit):
     '''
 
     # Obtains a set of unique words in our corpus
-    unqiue_words = set()
+    unique_words = set()
 
     for index, row in data.iterrows():
         temp_words = set(clean_words(row[doc]))
-        unqiue_words = unqiue_words.union(temp_words)
+        unique_words = unique_words.union(temp_words)
 
     # Sklearn Matrix Builder
 
@@ -255,8 +255,8 @@ def Word_Features(data, doc, limit):
     data['essay_clean'] = data.apply(
             lambda row: clean_sentence(row[doc]),axis=1)
 
-    # Define the vocab list for the Sklearn vecotrizer to search over
-    unique_words = list(unqiue_words)
+    # Define the vocab list for the Sklearn vectorizer to search over
+    unique_words = list(unique_words)
 
     # Train and run the sklearn vectorizor against the cleaned documents
     #   to get a sparse matrix representation
@@ -270,7 +270,7 @@ def Word_Features(data, doc, limit):
     term_frequency_counts = pd.DataFrame(count_matrix.apply(
             lambda column: sum(column)),columns=['Counts'])
 
-    # Subset the count_matrix to only inlcude terms that appear more than
+    # Subset the count_matrix to only include terms that appear more than
     #   the specified limit
     selected_words = term_frequency_counts[
             term_frequency_counts['Counts']>limit]
@@ -287,7 +287,7 @@ def Word_Features(data, doc, limit):
 #==============================================================================
 '''
 In the below section, we define the functions to identify and extract all
-sysnset based features from every document. These features will serve as inputs
+synset based features from every document. These features will serve as inputs
 into our classification model.
 '''
 
@@ -296,11 +296,11 @@ into our classification model.
 # Return ths Hypernym code (as a string) for each hypernym in the path
 def return_hypernym_codes(hypernym_list):
     '''
-    Purpose: This function extracts the sysnet name/code from wn.synset object
+    Purpose: This function extracts the synset name/code from wn.synset object
                 class. It then "cleans" this code by removing the token
                 separators allowing for easier analysis later on.
 
-    Input: a list of sysnet.objects (extracted using the WordNet_Translator
+    Input: a list of synset.objects (extracted using the WordNet_Translator
             function)
 
     Output: a list of cleaned synset codes
@@ -321,7 +321,7 @@ def WordNet_Translator(term):
     '''
     Purpose: This function "translates" a term into its synset equivalent.
              It does this by using the WordNet Lexical Database
-                 (developed at Princeton) implimneted in NLTK.
+                 (developed at Princeton) implemented in NLTK.
              Specifically, this function extracts the "hypernym path" for the
                  provided term and then replaces this term with its hypernym
                  equivlents in the document.
@@ -335,8 +335,8 @@ def WordNet_Translator(term):
                 translate (note it may not be able to translate obscure names,
                 words, or terms in a foreign language)
 
-    Output: A list of sysnset codes that are contained within the provided
-                term's hypernym path (with period deliniators removed for
+    Output: A list of synset codes that are contained within the provided
+                term's hypernym path (with period delineators removed for
                 easier analysis later on)
     '''
     hypernym_list = []
@@ -360,7 +360,7 @@ def synset_translated_string(text):
     '''
     Purpose: This function takes a sentence and returns a synset translated
     sentence in which all terms have been replaced with all the synset codes
-    along thier hypernym path.
+    along their hypernym path.
 
     Input: Sentence represented as a string
 
@@ -396,7 +396,7 @@ def Synset_Features(data, target, limit):
 
     A limit parameter of 0.01 means that a synset must appear in at least 1%
     of documents to be included in the synset matrix. This helps to remove
-    extreamly rare features that will provide little value during the modeling
+    extremely rare features that will provide little value during the modeling
     process.
     '''
 
@@ -453,12 +453,12 @@ document. All terms that occur within the same sentence are considered to be
 document's network. Translating document into a network based form allows us
 to extract three additional feature sets:
 
-    1) Edge Counts - First we calculate the occurance of every pair of
+    1) Edge Counts - First we calculate the occurrence of every pair of
         co-occuring words (within the same sentence) across all documents.
         Next we exclude those co-occuring words that are rare and not common
         enough to be a reliable feature to model on (this limiting parameter
         can be tuned by the user). Finally, we look across all document to
-        calculate the presence/abcesce of selected co-occuring terms. This
+        calculate the presence/absence of selected co-occuring terms. This
         final represention is stored as a Pandas dataframe allowing these
         features to be easily used for modeling.
 
@@ -467,16 +467,16 @@ to extract three additional feature sets:
         document. This is done by first identifying the shortest path between
         all terms in the network. Next we calculate the proportion of shortest
         paths that traverse each term (node). This proportion (bounded between
-        0 and 1) is refered to as the "betweeness centrality" of that synset.
+        0 and 1) is referred to as the "betweeness centrality" of that synset.
         This calculation is performed for every word in every document to
         ascertain that term's importance within that document.
 
-    3) Document Clusters - After translating all documents into thier network
-        representation, we aggreate all networks from all documents into a
+    3) Document Clusters - After translating all documents into their network
+        representation, we aggregate all networks from all documents into a
         single network that represents the entire corpus. From this network,
-        we run the Louvain clsutering algorithim to identify "clusters" of
+        we run the Louvain clustering algorithm to identify "clusters" of
         words within all documents. The clusters that emerge represent common
-        topics/arguements found across all essays. After identifying these
+        topics/arguments found across all essays. After identifying these
         clusters we calculate the concentration/presence of each cluster
         within each document.
 
@@ -493,13 +493,13 @@ def pd_edge_extractor(text):
     provided. Using this edge list a document graph can be created and term
     centrality/cluster features can be inferred. This is done through the
     following steps:
-     1) Initalize a blank dataframe to store the document edge list
+     1) Initialize a blank dataframe to store the document edge list
      2) Break a document into sentences using the Punkt Sentence Tokenizer
             (defined previously)
      3) Clean the sentence, lowercasing all words and removing punctuation
      4) Within each sentence, all combinations of 2 words are defined and
             appended to the dataframe
-     5) After performing this edge generation opertion on all sentences, the
+     5) After performing this edge generation operation on all sentences, the
         finalized document edge dataframe is returned
 
     Input: String representing the document text you would like to analyze
@@ -520,25 +520,25 @@ def pd_edge_extractor(text):
 
     return(doc_edge_list)
 
-def touple_edge_extractor(text):
+def tuple_edge_extractor(text):
     '''
-    Purpose: This function builds an edge/connections list for the documnet
+    Purpose: This function builds an edge/connections list for the document
     provided. Using this edge list a document graph can be created and term
     centrality/cluster features can be inferred. This is done through the
     following steps:
-     1) Initalize a blank list to store the document edge list
+     1) Initialize a blank list to store the document edge list
      2) Break a document into sentences using the Punkt Sentence Tokenizer
             (defined previously)
      3) Clean the sentence, lowercasing all words and removing punctuation
      4) Within each sentence, all combinations of 2 words are defined and
             appended to the list (terms are ordered alphabetically before
-            constructing the touple)
-     5) After performing this edge generation opertion on all sentences, the
+            constructing the tuple)
+     5) After performing this edge generation operation on all sentences, the
             finalized document edge list is returned
 
     Input: String representing the document text you would like to analyze
 
-    Output: A list containing all the word edges infered from that document
+    Output: A list containing all the word edges inferred from that document
 
     '''
 
@@ -558,10 +558,10 @@ def edge_translation(text):
     Purpose: This function translates a document into a representation of all
     of its edges. This is done through the following steps:
 
-     1) Initalize a blank string to hold the translated doucment
-     2) Extract all edges (represented as touples) using the
-            touple_edge_extractor function
-     3) Concatenate the touple into a single string which we will use as
+     1) Initialize a blank string to hold the translated document
+     2) Extract all edges (represented as tuples) using the
+            tuple_edge_extractor function
+     3) Concatenate the tuple into a single string which we will use as
             the edge ID
      4) Append this new edge ID to the translated document string
 
@@ -572,9 +572,9 @@ def edge_translation(text):
     '''
 
     doc_translation = ""
-    doc_touples = touple_edge_extractor(text)
+    doc_tuples = tuple_edge_extractor(text)
 
-    for t in doc_touples:
+    for t in doc_tuples:
         temp_t = str(t[0])+str(t[1])
         doc_translation = doc_translation +" "+temp_t
 
@@ -584,8 +584,8 @@ def edge_translation(text):
 def Word_Edge_Features(data, target, limit):
     '''
     Purpose: In this function we build a word network for all documents, find
-    common co-occuring terms, then calculate the prevelence of those
-    co-occuring terms across all documents. This co-occurence matrix is then
+    common co-occuring terms, then calculate the prevalence of those
+    co-occuring terms across all documents. This co-occurrence matrix is then
     used as an input to our modeling feature space.
 
     Input: This function requires the following inputs:
@@ -598,7 +598,7 @@ def Word_Edge_Features(data, target, limit):
             sufficiently rare that they do not add any predictive value.
             A limit parameter of 0.01 means that a co-occuring term pair must
             appear in at least 1% of documents to be included in the term matrix.
-            This helps to remove extreamly rare features (as well as mispellings)
+            This helps to remove extremely rare features (as well as misspellings)
             that will provide little value during the modeling process.
 
     Output: This function returns a document (d) by feature (f) (d x f)
@@ -648,14 +648,14 @@ def Word_Centrality_Features(data, doc, selected_words):
     Purpose: This function returns the "importance" of every word, within every
     document through the use of graph analysis through the following steps:
 
-        1) A blank pandas DataFrame (word_centrality_matrix) is initalized to
+        1) A blank pandas DataFrame (word_centrality_matrix) is initialized to
             hold the resulting word betweeness centralities in every document
         2) All documents are translated into a co-occuring term/edge
-            representation using the touple_edge_extractor function
-        3) A blank graph is initalized for each document using NetworkX
+            representation using the tuple_edge_extractor function
+        3) A blank graph is initialized for each document using NetworkX
         4) All co-occuring terms/edges are fed into a NetworkX graph
         5) For "selected terms" (defined in the Word_Features function) the
-            betweenness centrality is calculated for all terms then appeneded
+            betweenness centrality is calculated for all terms then appended
             to the word_centrality_matrix
         6) Once this is complete for all terms in all documents the finalized
             DataFrame is returned
@@ -679,10 +679,10 @@ def Word_Centrality_Features(data, doc, selected_words):
     # Populate DataFrame with betweenness centralities
     for index, row in data.iterrows():
 
-        # Extract all edges from the docuemnt as touples
-        doc_edges = touple_edge_extractor(row[doc])
+        # Extract all edges from the document as tuples
+        doc_edges = tuple_edge_extractor(row[doc])
 
-        # Create a graph using all the edge inputs as touples
+        # Create a graph using all the edge inputs as tuples
         G = nx.Graph()
         G.add_edges_from(doc_edges)
         btwn_dict = nx.betweenness_centrality(G)
@@ -713,12 +713,12 @@ every document. Synsets that occur within the same sentence share an edge
 within the network. Translating document into a network based form allows us
 to extract two additional feature sets:
 
-    1) Synset Edge Counts - First we calculate the occurance of every pair of
+    1) Synset Edge Counts - First we calculate the occurrence of every pair of
         co-occuring synsets (within the same sentence) across all documents.
-        Next we exclude those co-occuring sysents that are rare and not common
+        Next we exclude those co-occuring synsets that are rare and not common
         enough to be a reliable feature to model on (this limiting parameter
         can be tuned by the user). Finally, we look across all document to
-        calculate the presence/abcesce of selected co-occuring synsets. This
+        calculate the presence/absence of selected co-occuring synsets. This
         final represention is stored as a Pandas dataframe allowing these
         features to be easily used for modeling.
 
@@ -727,16 +727,16 @@ to extract two additional feature sets:
         document. This is done by first identifying the shortest path between
         all synset in the network. Next we calculate the proportion of shortest
         paths that traverse each synset. This proportion (bounded between 0
-        and 1) is refered to as the "betweeness centrality" of that synset.
+        and 1) is referred to as the "betweeness centrality" of that synset.
         This calculation is performed for every synset in every document to
         ascertain that synset's importance within that document.
 
     3) Synset Document Clusters - After translating all documents into their
-        synset network representation, we aggreate all networks from all
+        synset network representation, we aggregate all networks from all
         documents into a single network that represents the entire corpus.
-        From this network, we run the Louvain clsutering algorithim to
+        From this network, we run the Louvain clustering algorithm to
         identify "clusters" of synsets within all documents. The clusters that
-        emerge represent common topics/arguements found across all essays.
+        emerge represent common topics/arguments found across all essays.
         After identifying these clusters, we calculate the concentration/presence
         of each cluster within each document.
 
@@ -749,7 +749,7 @@ def synset_translated_sentence(text):
     Purpose: This function takes a given string and returns a list of all the
     synsets for all the terms contains within that string. This is done through
     the following:
-     1) A blank synset list is initalized
+     1) A blank synset list is initialized
      2) The string is cleaned, lowercasing all text as well as removing
             stopwords and punctuation
      3) Every term contained within that string is translated into it WordNet
@@ -779,11 +779,11 @@ def synset_translated_sentence(text):
 def pd_edge_extractor_synset(text):
     '''
     Purpose: This function builds a list of all the synset edge/connections
-    contained within the provided documnet. Using this edge list, a document
+    contained within the provided document. Using this edge list, a document
     graph can be created and synset centrality/cluster features can be inferred.
     This is done through the following steps:
 
-     1) Initalize a blank dataframe to store the document edge list
+     1) Initialize a blank dataframe to store the document edge list
      2) Break a document into sentences using the Punkt Sentence Tokenizer
             (defined previously)
      3) Clean the sentence, lowercasing all words and removing punctuation
@@ -792,7 +792,7 @@ def pd_edge_extractor_synset(text):
             synset_translated_sentence function
      5) Within each sentence, all combinations of 2 synsets are found and then
             appended to the dataframe
-     5) After performing this edge generation opertion on all sentences, the
+     5) After performing this edge generation operation on all sentences, the
             finalized document edge dataframe is returned
 
     Input: String representing the document text you would like to analyze
@@ -813,25 +813,25 @@ def pd_edge_extractor_synset(text):
 
     return(doc_edge_list)
 
-def touple_edge_extractor_synset(text):
+def tuple_edge_extractor_synset(text):
     '''
     Purpose: This function builds an edge/connections list for the document
     provided. Using this edge list a document graph can be created and term
     centrality/cluster features can be inferred. This is done through the
     following steps:
-     1) Initalize a blank list to store the document edge list
+     1) Initialize a blank list to store the document edge list
      2) Break a document into sentences using the Punkt Sentence Tokenizer
             (defined previously)
      3) Clean the sentence, lowercasing all words and removing punctuation
      4) Within each sentence, all combinations of 2 words are defined and
             appended to the list (terms are ordered alphabetically before
-            constructing the touple)
-     5) After performing this edge generation opertion on all sentences, the
+            constructing the tuple)
+     5) After performing this edge generation operation on all sentences, the
             finalized document edge list is returned
 
     Input: String representing the document text you would like to analyze
 
-    Output: A list containing all the word edges infered from that document
+    Output: A list containing all the word edges inferred from that document
 
     '''
 
@@ -851,10 +851,10 @@ def edge_translation_synset(text):
     Purpose: This function translates a document into a representation of all
     of its synset edges. This is done through the following steps:
 
-     1) Initalize a blank string to hold the translated doucment
-     2) Extract all synset edges (represented as touples) using the
-            touple_edge_extractor function
-     3) Concatenate each touple into a single string which we will use as
+     1) Initialize a blank string to hold the translated document
+     2) Extract all synset edges (represented as tuples) using the
+            tuple_edge_extractor function
+     3) Concatenate each tuple into a single string which we will use as
             the edge ID
      4) Append this new edge ID to the translated document string
 
@@ -865,9 +865,9 @@ def edge_translation_synset(text):
     '''
 
     doc_translation = ""
-    doc_touples = touple_edge_extractor_synset(text)
+    doc_tuples = tuple_edge_extractor_synset(text)
 
-    for t in doc_touples:
+    for t in doc_tuples:
         temp_t = str(t[0])+str(t[1])
         doc_translation = doc_translation +" "+temp_t
 
@@ -877,8 +877,8 @@ def edge_translation_synset(text):
 def Synset_Edge_Features(data, target, limit):
     '''
     Purpose: In this function we build a synset network for all documents,
-    find common co-occuring synsets, then calculate the prevelence of those
-    co-occuring synsets across all documents. This co-occurence matrix is then
+    find common co-occuring synsets, then calculate the prevalence of those
+    co-occuring synsets across all documents. This co-occurrence matrix is then
     used as an input to our modeling feature space.
 
     Input: This function requires the following inputs:
@@ -890,8 +890,8 @@ def Synset_Edge_Features(data, target, limit):
             sufficiently rare that they do not add any predictive value. A limit
             parameter of 0.01 means that a co-occuring synset pair must appear
             in at least 1% of documents to be included in the term matrix.
-            This helps to remove extreamly rare features (as well as
-            mispellings) that will provide little value during the modeling
+            This helps to remove extremely rare features (as well as
+            misspellings) that will provide little value during the modeling
             process.
 
     Output: This function returns a document (d) by feature (f) (d x f)
@@ -945,14 +945,14 @@ def Synset_Centrality_Features(data, doc, selected_synsets):
     Purpose: This function returns the "importance" of every synset, within
     every document through the use of graph analysis through the following
     steps:
-        1) A blank pandas DataFrame (word_centrality_matrix) is initalized to
+        1) A blank pandas DataFrame (word_centrality_matrix) is initialized to
             hold the resulting synset betweeness centralities in every document
         2) All documents are translated into a co-occuring synset/edge
-            representation using the touple_edge_extractor_synset function
-        3) A blank graph is initalized for each document using NetworkX
+            representation using the tuple_edge_extractor_synset function
+        3) A blank graph is initialized for each document using NetworkX
         4) All co-occuring synset/edges are fed into a NetworkX graph
         5) For "selected synset" (defined in the Synset_Features function) the
-            betweenness centrality is calculated for all synset then appeneded
+            betweenness centrality is calculated for all synset then appended
             to the synset_centrality_matrix
         6) Once this is complete for all synset in all documents the finalized
             DataFrame is returned
@@ -975,10 +975,10 @@ def Synset_Centrality_Features(data, doc, selected_synsets):
     # Populate DataFrame with betweenness centralities
     for index, row in data.iterrows():
 
-        # Extract all edges from the docuemnt as touples
-        doc_edges = touple_edge_extractor_synset(row[doc])
+        # Extract all edges from the document as tuples
+        doc_edges = tuple_edge_extractor_synset(row[doc])
 
-        # Create a graph using all the edge inputs as touples
+        # Create a graph using all the edge inputs as tuples
         G = nx.Graph()
         G.add_edges_from(doc_edges)
         btwn_dict = nx.betweenness_centrality(G)
@@ -986,7 +986,7 @@ def Synset_Centrality_Features(data, doc, selected_synsets):
         Node_list = list(Node_list & set(selected_synsets))
         temp_dict = {}
 
-        # Calcuate the betweeness centralities of all synsets contained
+        # Calculate the betweeness centralities of all synsets contained
         #   within the Node_List
         for n in Node_list:
             col = str(n)+"_btw"
@@ -1038,18 +1038,18 @@ def Unpack_Image_Hashes(data, images, target):
     '''
 
     # p = Unpack_Image_Hashes(data, 'Doc_Hashes', target)
-    # Define a dataframe to hodl results
+    # Define a dataframe to hold results
     image_df = pd.DataFrame()
 
     # Define a loop to unpack all the hashes
     for index, row in data.iterrows():
 
-        # Establish Values for that docuemnt
+        # Establish Values for that document
         doc_name = row['Doc_Title']
         doc_score = row[target]
 
         # Iterate through and append the image hash for each image (as long as
-        #   it does not conatin all zero's (is blank))
+        #   it does not contain all zero's (is blank))
         for i in row[images]:
             if i.min()<0 or i.max()>0:
                 image_df = image_df.append(
@@ -1094,7 +1094,7 @@ def Return_Image_Score(row, hashes, image_df):
             1) row = a row of the original dataframe that contains image hashes
             2) hashes = the column/feature within that row that contains the
                         image hashes
-            3) image_df = a flattened image hash table provided ontained from
+            3) image_df = a flattened image hash table provided by
                           the Unpack_Image_Hashes function
 
     Output: This function returns the average target score for documents with

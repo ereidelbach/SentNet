@@ -1,6 +1,7 @@
 # Ignore all .docx files in the Set7 and Set8 folders
 Data/Set1/docx/*.docx
 Data/Set1/docx/Images/*.docx
+Data/Set1/docx/Images/Unpacked/*.png
 Data/Set2/docx/*.docx
 Data/Set2/docx/Images/*.docx
 Data/Set3/docx/*.docx

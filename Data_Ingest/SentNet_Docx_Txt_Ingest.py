@@ -1,10 +1,10 @@
 #!/usr/bin/env python3.6
 # -*- coding: utf-8 -*-
-"""
+'''
 :DESCRIPTION:
     - This script will ingest individual .docx files and .txt files and store
         them in a dataframe that matches the original format of the training
-        data (i.e. training_set_rel3.csv in the \Data\ folder).
+        data (i.e. training_set_rel3.csv in the Data folder).
     - DataFrame variables depend on the type of data being ingested but will
         include, at a minimum:
             * essay_id: A unique identifier for each individual student essay
@@ -23,7 +23,7 @@
     
 :TODO:
     NONE
-"""
+'''
  
 #==============================================================================
 # Package Import
@@ -62,7 +62,7 @@ def ingest_files(path):
             doc = docx2txt.process(os.path.join(path, filename))
             # break up the contents of the file by splitting on line spaces
             doc_elements = doc.split('\n\n')
-            # iterate throgh the elements two at a time to grab the variable name
+            # iterate through the elements two at a time to grab the variable name
             #   and the data associated with that variable (i.e. header)
             for (key, value) in zip(doc_elements[::2], doc_elements[1::2]):
                 doc_dict[key] = value

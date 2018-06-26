@@ -48,11 +48,14 @@ Document_Similarity_Training, Document_Similarity_Testing
 # Establish the project root directory
 path_project_root = Path('SentNet_Training_Master.py').resolve().parent
 
+# Specify the data folder that we want to model
+data_set = 'Set1'
+
 ################################## .Docx Data Ingest ##########################
 # Assumes the Set1 Data is in the path: SentNet\Data\Set1\docx\Images
-path_data = Path(path_project_root, 'Data','Set1','docx','Images')
+path_data = Path(path_project_root, 'Data',data_set,'docx','Images')
 # It will place your image files in: SentNet\Data\Set1\docx\Images\Unpacked
-path_images = Path(path_project_root,'Data','Set1','docx','Images', 'Unpacked')
+path_images = Path(path_project_root,'Data',data_set,'docx','Images', 'Unpacked')
 # check to make sure a folder exists for the unpacked images directory
 if os.path.isdir(path_images) == False:
     os.makedirs(path_images)
@@ -105,15 +108,22 @@ train.reset_index(drop=True, inplace=True)
 test.reset_index(drop=True, inplace=True)
 
 #==============================================================================
-# Feature Extraction
+# Model_Parameters
 #==============================================================================
-
 # Define the minimum threshold (the number of documents a feature must appear
 #   in) for a feature to be included in our analysis
 limit = round(0.02*len(train))
+
+# The element/scorecard you are attempting to estimate
 target = 'domain1_score'
+
+# The name of the column in the dataframe which contains the document text 
+#   to be scored
 doc = 'essay'
 
+#==============================================================================
+# Feature Extraction
+#==============================================================================
 # Converting target to int for modeling
 train[target] = pd.to_numeric(train[target], errors='coerce')
 test[target] = pd.to_numeric(test[target], errors='coerce')
@@ -132,8 +142,8 @@ print('Done with Document Matching.')
 
 # General Similarity score (Doc2Vec)
 similar_docs = Document_Similarity_Training(train, doc, target)
-gensim_model_similarity = similar_docs['gensim_training_similiarity']
-similar_docs = similar_docs['train_esimates']
+gensim_model_similarity = similar_docs['gensim_training_similarity']
+similar_docs = similar_docs['train_estimates']
 print('Done with Document Similarity.')
 
 # Calculate word level features for each document
@@ -193,7 +203,7 @@ train_data = train_data.replace(np.nan,0)
 train_data = train_data.replace('.',0)
 train_data = train_data.loc[:,~train_data.columns.duplicated()]
 
-# Train inital random forest for feature selection
+# Train initial random forest for feature selection
 rfc = RandomForestClassifier(n_estimators=10000, n_jobs=7)
 rfc.fit(train_data,train[target])
 
@@ -328,10 +338,10 @@ preds.to_csv(Path(dir_path,file_name))
 #==============================================================================
 '''
 While it would be beneficial to frequently retrain the random forest models as
-new scored docuemnts become available, we forsee the need to score additional
+new scored documents become available, we forsee the need to score additional
 documents without retraining the model first. When this is the case, it would
-be more effecitve to simply import the already trained models (if your previous
-sesssion ended or shutdown) and simply run new observations through those models
+be more effective to simply import the already trained models (if your previous
+session ended or shutdown) and simply run new observations through those models
 (as opposed to having to retrain the models from scratch). When this is the
 case we must export our final models and feature set so they can be imported
 later. To accomplish this we do the following:

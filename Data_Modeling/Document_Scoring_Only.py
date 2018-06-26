@@ -3,7 +3,7 @@
 """
 :DESCRIPTION:
     While it would be beneficial to frequently retrain the random forest models 
-    as new scored docuemnts become available, we forsee the need to score 
+    as new scored documents become available, we forsee the need to score 
     additional documents without retraining the SentNet models first. 
     
     When this is the case, it would be more effective to import the already 
@@ -111,10 +111,9 @@ with open('path/to/file', 'rb') as f:
 #==============================================================================
 # Model_Parameters
 #==============================================================================
-
 # Define the minimum threshold (the number of documents a feature must 
 #   appear in) for a feature to be included in our analysis
-limit = round(0.02*len(train))
+limit = round(0.02*len(score))
 
 # The element/scorecard you are attempting to estimate
 target = 'domain1_score'

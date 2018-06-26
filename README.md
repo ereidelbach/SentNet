@@ -11,11 +11,11 @@ Submissions to the challenge were judged against their ability to evaluate analy
 * Properly express and explain uncertainties associated with major analytic judgments.
 * Properly distinguish between underlying intelligence information and analysts' assumptions and judgments.
 * Incorporate analysis of alternatives
-* Demonstrate relavance to customers and address implications and opportunities.
+* Demonstrate relevance to customers and address implications and opportunities.
 * Use clear and logical argumentation.
 * Explain change to or consistency of analytic judgments.
 * Make sound judgments and assertions.
-* Incorporate effective visual information where appopriate.
+* Incorporate effective visual information where appropriate.
 
 SentNet was created by [Taylor Corbett](https://github.com/data4d) and [Eric Reidelbach](https://github.com/ereidelbach).
 

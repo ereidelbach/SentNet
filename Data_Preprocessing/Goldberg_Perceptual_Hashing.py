@@ -21,7 +21,8 @@
 #==============================================================================
 # install via (conda install scikit-image or pip install scikit-image)
 from skimage.color import rgb2gray
-from skimage.io import imread
+#from skimage.io import imread
+from imageio import imread
 from PIL import Image
 from PIL.MpoImagePlugin import MpoImageFile
 try:

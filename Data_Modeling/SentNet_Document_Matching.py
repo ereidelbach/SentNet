@@ -3,7 +3,7 @@
 """
 :DESCRIPTION:
     In this file we define the functions that are required to perform document 
-    matching with SentNet using a Doc2Vec model implimented in Gensim.
+    matching with SentNet using a Doc2Vec model implemented in Gensim.
 
 :REQUIRES:
     NONE
@@ -45,7 +45,7 @@ def read_corpus(data, field, tokens_only=False):
             (word list), but don't have any tags for those documents (as with 
             testing data) specify tokens_only=True
         
-    Output: This function returns a doc2vec.TaggedDocument as decribed above.
+    Output: This function returns a doc2vec.TaggedDocument as described above.
         
     '''
     
@@ -100,14 +100,14 @@ def Doc2Vec_Estimates_Training(model, train_corpus, scores_join, target, limit=0
    
     This requires the following steps:
                  
-         1) Initalize an empty estimates dataframe to hold estimated values in
+         1) Initialize an empty estimates dataframe to hold estimated values in
          2) For every document in the dataset find the second most similar 
             document within the corpus to the document provided (the second 
             most similar document is used, otherwise the document would match 
             to itself)
          3) Assign the value of the second most similar document to this 
-            document as well as the "probabiliy"/"similarity" of the match
-         4) If the probabily falls below a given threshold (usually .7) 
+            document as well as the "probability"/"similarity" of the match
+         4) If the probability falls below a given threshold (usually .7) 
             assign the predicted class to 0
          5) Append the result to the estimates dataframe
         
@@ -120,7 +120,7 @@ def Doc2Vec_Estimates_Training(model, train_corpus, scores_join, target, limit=0
         3) scores_join = a Pandas dataframe that contains the index of all 
              documents within the training set as well as the target score 
              for those documents
-        4) target = the target/feature you are attmeping to model/estiamte
+        4) target = the target/feature you are attempting to model/estimate
         5) limit = the probability limit that a prediction must exceed for 
              that prediction to be assigned/passed on (usually .7, but 
              defaults to 0 if not assigned)
@@ -181,13 +181,13 @@ def Doc2Vec_Estimates_Testing(model, train_corpus, scores_join, target, limit=0)
     
     This requires the following steps:
                  
-        1) Initalize an empty estimates dataframe to hold estimated values in
+        1) Initialize an empty estimates dataframe to hold estimated values in
         2) For every document in the dataset find the most similar document 
             within the corpus to the document provided (in comparison to the 
             second most similar document as with training data)
         3) Assign the value of the most similar document to this document as 
-            well as the "probabiliy"/"similarity" of the match
-        4) If the probabily falls below a given threshold (usually .7) assign
+            well as the "probability"/"similarity" of the match
+        4) If the probability falls below a given threshold (usually .7) assign
             the predicted class to 0
         5) Append the result to the estimates dataframe
         
@@ -200,7 +200,7 @@ def Doc2Vec_Estimates_Testing(model, train_corpus, scores_join, target, limit=0)
         3) scores_join = a Pandas dataframe that contains the index of all 
              documents within the training set as well as the target score 
              for those documents
-        4) target = the target/feature you are attmeping to model/estiamte
+        4) target = the target/feature you are attempting to model/estimate
         5) limit = the probability limit that a prediction must exceed for 
              that prediction to be assigned/passed on (usually .7, but 
              defaults to 0 if not assigned)

@@ -3,7 +3,7 @@
 """
 :DESCRIPTION:
     In this file we define the functions that are required to perform document 
-    similarity with SentNet using a Doc2Vec model implimented in Gensim.
+    similarity with SentNet using a Doc2Vec model implemented in Gensim.
 
     In comparison to the document matching functionality within SentNet, 
     this set of functions attempts to estimate a score for a given document 
@@ -54,7 +54,7 @@ def read_corpus_sim(data, field, target, tokens_only=False):
             document (word list), but don't have any tags for those documents 
             (as with testing data) specify tokens_only=True
         
-    Output: This function returns a doc2vec.TaggedDocument as decribed above.
+    Output: This function returns a doc2vec.TaggedDocument as described above.
         
     '''
     
@@ -108,14 +108,14 @@ def Doc2Vec_Sim_Estimates(model, train_corpus, limit=0):
     
     This requires the following steps:
                  
-     1) Initalize an empty estimates dataframe to hold estimated values in
+     1) Initialize an empty estimates dataframe to hold estimated values in
      2) For every document in the dataset find extract features from that 
         document and compare it to the known features within the labeled 
         training set
      3) Find the document group/cluster this group is the most similar as well 
-        as the "probabiliy"/"similarity" of this document belonging to that 
+        as the "probability"/"similarity" of this document belonging to that 
         group
-     4) If the probabily falls below a given threshold (usually .7) assign the 
+     4) If the probability falls below a given threshold (usually .7) assign the 
         predicted class to 0
      5) Append the result to the estimates dataframe
 
@@ -209,14 +209,14 @@ def Document_Similarity_Training(train, doc, target, limit=0):
     train_corpus = list(read_corpus_sim(train, doc, target))
     
     # Define Model
-    gensim_training_similiarity = Doc2Vec_Training_Model_Sim(train_corpus)
+    gensim_training_similarity = Doc2Vec_Training_Model_Sim(train_corpus)
     
     # Obtain estimated document similarities
     train_estimates = Doc2Vec_Sim_Estimates(
-            gensim_training_similiarity, train_corpus, limit)
+            gensim_training_similarity, train_corpus, limit)
     
     return({'train_estimates':train_estimates, \
-            'gensim_training_similiarity':gensim_training_similiarity})
+            'gensim_training_similarity':gensim_training_similarity})
 
 
 def Document_Similarity_Testing(test, doc, target, gensim_model, limit):

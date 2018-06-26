@@ -46,7 +46,7 @@ def Clustering_Features(edge_table, limit, remove_duplicates=False):
                         threshold into a NetworkX graph, creating a new "edge" 
                         or connection within the graph for every set of 
                         co-occuring items in our table
-                 4) After this we use the Louvain algorithim to partition the 
+                 4) After this we use the Louvain algorithm to partition the 
                         word graph into clusters and assign each term within 
                         the graph to one of these clusters
         
@@ -180,7 +180,7 @@ def Synset_Clustering_Features(edge_table, limit, remove_duplicates=False):
                       threshold into a NetworkX graph, creating a new "edge" or 
                       connection within the graph for every set of co-occuring 
                       items in our table
-                 4) After this we use the Louvain algorithim to partition the 
+                 4) After this we use the Louvain algorithm to partition the 
                       work/synset graph into clusters and assign each synset 
                       within the graph to one of these clusters
         
@@ -196,7 +196,7 @@ def Synset_Clustering_Features(edge_table, limit, remove_duplicates=False):
                         can change the clusters produced
         
     Output: This function returns a pandas DataFrame that maps synsets within 
-            the graph to thier coresponding topic cluster
+            the graph to their coresponding topic cluster
     '''
     
     # Edges Group By Edge to Subset

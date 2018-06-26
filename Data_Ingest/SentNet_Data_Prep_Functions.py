@@ -41,7 +41,7 @@ def File_Selector_Training(path):
         .csv, or .xlsx.
     
     Purpose: This allows for the scored training data to be read in from one or 
-        multuiple files. Data in these sheets must be provided in the accepted 
+        multiple files. Data in these sheets must be provided in the accepted 
         format (example spreadsheet has been provided).
              
         Col_1_UUID, Col_2_ScoreCard_Name, Col_3_Doc_Text, Col_4_List_of_JPEGs, 
@@ -59,7 +59,7 @@ def Text_File_Selector(path):
     Output: Returns a list of files in the provided directory that end in 
         .txt, .doc, or .docx.
     
-    Purpose: This allows testing data to be read in from one or multuiple files.
+    Purpose: This allows testing data to be read in from one or multiple files.
              
     '''
     
@@ -74,7 +74,7 @@ def Image_File_Selector(path):
     Output: Returns a list of files in the provided directory that end in 
         .txt, .doc, or .docx.
     
-    Purpose: This allows testing data to be read in from one or multuiple files.
+    Purpose: This allows testing data to be read in from one or multiple files.
              
     '''
     
@@ -89,7 +89,7 @@ def Docx_File_Selector(path):
     Output: Returns a list of files in the provided directory that end in \
         .txt, .doc, or .docx.
     
-    Purpose: This allows testing data to be read in from one or multuiple files.
+    Purpose: This allows testing data to be read in from one or multiple files.
              
     '''
     
@@ -296,11 +296,11 @@ def Ingest_Training_Data(doc_folder_path, img_dir):
              headers and footers concatenated with body text for each file)
         3) Doc_Images = the titles of all the images extracted from the source 
             files that have been deposited in the specified image_dir folder
-        4) Doch Hashes = the hashes of all images extracted from the source
+        4) Doc Hashes = the hashes of all images extracted from the source
             files that have been deposited into the specified image_dir folder
 
     '''
-    # Initalize a dataframe to hold results
+    # Initialize a dataframe to hold results
     Training_Data = pd.DataFrame(
             columns=['Doc_Title','Doc_Text','Doc_Images','Doc_Hashes'])
     
